@@ -1,6 +1,6 @@
 QT -= gui
 
-QT += core serialport network
+QT += core serialport network script
 CONFIG += c++11 console
 CONFIG -= app_bundle
 
@@ -54,9 +54,9 @@ SOURCES += main.cpp \
     webrtc/spl_sqrt_floor.c \
     webrtc/splitting_filter.c \
     webrtc/vector_scaling_operations.c \
-    libns.c \
     json/zjsonthread.cpp \
     forward/ztcp2uartthread.cpp
+    #libns.c
 
 
 HEADERS += \
@@ -79,7 +79,6 @@ HEADERS += \
     webrtc/spl_inl.h \
     webrtc/typedefs.h \
     webrtc/windows_private.h \
-    libns.h \
     zgblpara.h \
     zaudiocapturethread.h \
     zaudioplaythread.h \
@@ -90,3 +89,4 @@ HEADERS += \
     forward/ztcp2uartthread.h
 
 LIBS += -lasound -lopus
+LIBS += -L$$PWD/../libns -lwebrtc -lrnnoise -lns

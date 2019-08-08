@@ -6,6 +6,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonParseError>
+#include <QJsonArray>
 #include <QDateTime>
 #include <QProcess>
 
@@ -29,7 +30,8 @@ void ZJsonThread::run()
     this->m_recvBuffer=new qint8[BUFSIZE_1MB];
     while(!gGblPara.m_bGblRst2Exit)
     {
-        gGblPara.m_bCtlClientConnected=false;//设置断开标志.
+        //tcp disconnected.
+        gGblPara.m_bJsonConnected=false;
 
         //listen.
         if(!tcpServer->listen(QHostAddress::Any,TCP_PORT_CTL))
@@ -44,7 +46,8 @@ void ZJsonThread::run()
         {
             if(tcpServer->waitForNewConnection(1000*1))//1s.
             {
-                gGblPara.m_bCtlClientConnected=true;//设置连接标志.
+                //tcp connected.
+                gGblPara.m_bJsonConnected=true;
                 break;
             }
         }
@@ -72,9 +75,9 @@ void ZJsonThread::run()
                     qDebug()<<"<Warning>:not read any json data.";
                     continue;
                 }
-//                qDebug()<<"----------------read all begin-----------";
-//                qDebug()<<baJsonData;
-//                qDebug()<<"----------------read all end-----------";
+                //                qDebug()<<"----------------read all begin-----------";
+                //                qDebug()<<baJsonData;
+                //                qDebug()<<"----------------read all end-----------";
                 if(baJsonData.size()>0)
                 {
                     memcpy(this->m_recvBuffer+this->m_nJsonLen,baJsonData.data(),baJsonData.size());
@@ -85,16 +88,16 @@ void ZJsonThread::run()
             }
             //只有开启图像匹配功能时才上传匹配结果集.
 #if 1
-            if(gGblPara.m_bJsonImgPro)
+            if(gGblPara.m_bJsonImgProOn)
             {
                 QJsonObject jsonObj;
-//                jsonObj.insert("ImgMatched",///<
-//                               QString("%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11")///<
-//                               .arg(gGblPara.m_video.m_rectTemplate.x()).arg(gGblPara.m_video.m_rectTemplate.y())///<
-//                               .arg(gGblPara.m_video.m_rectTemplate.width()).arg(gGblPara.m_video.m_rectTemplate.height())///<
-//                               .arg(gGblPara.m_video.m_rectMatched.x()).arg(gGblPara.m_video.m_rectMatched.y())///<
-//                               .arg(gGblPara.m_video.m_rectMatched.width()).arg(gGblPara.m_video.m_rectMatched.height())///<
-//                               .arg(gGblPara.m_video.m_nDiffX).arg(gGblPara.m_video.m_nDiffY).arg(gGblPara.m_video.m_nCostMs));
+                //                jsonObj.insert("ImgMatched",///<
+                //                               QString("%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11")///<
+                //                               .arg(gGblPara.m_video.m_rectTemplate.x()).arg(gGblPara.m_video.m_rectTemplate.y())///<
+                //                               .arg(gGblPara.m_video.m_rectTemplate.width()).arg(gGblPara.m_video.m_rectTemplate.height())///<
+                //                               .arg(gGblPara.m_video.m_rectMatched.x()).arg(gGblPara.m_video.m_rectMatched.y())///<
+                //                               .arg(gGblPara.m_video.m_rectMatched.width()).arg(gGblPara.m_video.m_rectMatched.height())///<
+                //                               .arg(gGblPara.m_video.m_nDiffX).arg(gGblPara.m_video.m_nDiffY).arg(gGblPara.m_video.m_nCostMs));
                 QJsonDocument jsonDoc;
                 jsonDoc.setObject(jsonObj);
                 QByteArray baTx=jsonDoc.toJson();
@@ -133,8 +136,8 @@ void ZJsonThread::run()
 
 qint32 ZJsonThread::ZScanRecvBuffer()
 {
-//    QByteArray prt((char*)this->m_recvBuffer,this->m_nJsonLen);
-//    qDebug()<<prt;
+    //    QByteArray prt((char*)this->m_recvBuffer,this->m_nJsonLen);
+    //    qDebug()<<prt;
     qint32 nOffset=0;
     qint32 nRemainingBytes=this->m_nJsonLen;
     while(nRemainingBytes>0)
@@ -183,7 +186,7 @@ qint32 ZJsonThread::ZScanRecvBuffer()
                 this->m_tcpSocket->waitForBytesWritten(100);
             }
         }
-//        qDebug()<<"nRemaingBytes:"<<nRemainingBytes;
+        //        qDebug()<<"nRemaingBytes:"<<nRemainingBytes;
 #endif
     }
     if(nRemainingBytes>0 && nOffset>0)
@@ -191,8 +194,8 @@ qint32 ZJsonThread::ZScanRecvBuffer()
         memmove(this->m_recvBuffer,this->m_recvBuffer+nOffset,nRemainingBytes);
         this->m_nJsonLen=nRemainingBytes;
         this->m_recvBuffer[nRemainingBytes]='\0';
-//        qDebug()<<"after processed:remaing:"<<this->m_nJsonLen;
-//        qDebug()<<QByteArray((const char*)this->m_recvBuffer,this->m_nJsonLen);
+        //        qDebug()<<"after processed:remaing:"<<this->m_nJsonLen;
+        //        qDebug()<<QByteArray((const char*)this->m_recvBuffer,this->m_nJsonLen);
     }else{
         //processed all bytes.nRemainingBytes=0,so reset here.
         memset(this->m_recvBuffer,0,BUFSIZE_1MB);
@@ -218,18 +221,18 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                     //设置图像比对开启标志位.
                     //这将引起采集线程向Process队列扔图像数据.
                     //从而ImgProcess线程解除等待开始处理图像.
-                    gGblPara.m_bJsonImgPro=true;
+                    gGblPara.m_bJsonImgProOn=true;
                 }else if(method=="off")
                 {
                     //设置图像比对暂停标志位.
                     //这将引起采集线程不再向Process队列扔图像数据.
                     //使得ImgProcess线程等待信号量从而暂停.
-                    gGblPara.m_bJsonImgPro=false;
+                    gGblPara.m_bJsonImgProOn=false;
                 }else if(method=="query")
                 {
                     //仅用于查询当前状态.
                 }
-                jsonObjFeedBack.insert("ImgPro",gGblPara.m_bJsonImgPro?"on":"false");
+                jsonObjFeedBack.insert("ImgPro",gGblPara.m_bJsonImgProOn?"on":"false");
             }
         }
         if(jsonObj.contains("RTC"))
@@ -390,33 +393,6 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                 }
             }
         }
-        if(jsonObj.contains("FlushUI"))
-        {
-            QJsonValue val=jsonObj.take("FlushUI");
-            if(val.isString())
-            {
-                QString flushUI=val.toVariant().toString();
-                if(flushUI=="on")
-                {
-                    gGblPara.m_bJsonFlushUIWav=true;
-                    gGblPara.m_bJsonFlushUIImg=true;
-
-                }else if(flushUI=="off")
-                {
-                    gGblPara.m_bJsonFlushUIWav=false;
-                    gGblPara.m_bJsonFlushUIImg=false;
-                }else if(flushUI=="query")
-                {
-                    //仅用于查询当前状态.
-                }
-                if(gGblPara.m_bJsonFlushUIWav && gGblPara.m_bJsonFlushUIImg)
-                {
-                    jsonObjFeedBack.insert("FlushUI","on");
-                }else{
-                    jsonObjFeedBack.insert("FlushUI","off");
-                }
-            }
-        }
         if(jsonObj.contains("Cam1CenterXY"))
         {
             QJsonValue val=jsonObj.take("Cam1CenterXY");
@@ -500,12 +476,27 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                 QString str=val.toVariant().toString();
                 if(str=="query")
                 {
+                    jsonObjFeedBack.insert("Accumulated","0");
+                }else{
+                    qDebug()<<"<Error>:unknow cmd in Accumulated json.";
+                }
+            }
+        }
+        if(jsonObj.contains("Accumulated"))
+        {
+            QJsonValue val=jsonObj.take("Accumulated");
+            if(val.isString())
+            {
+                QString str=val.toVariant().toString();
+                if(str=="query")
+                {
                     jsonObjFeedBack.insert("Accumulated",QString::number(gGblPara.m_nAccumulatedSec));
                 }else{
                     qDebug()<<"<Error>:unknow cmd in Accumulated json.";
                 }
             }
         }
+
         if(jsonObj.contains("StrongMode"))
         {
             QJsonValue val=jsonObj.take("StrongMode");
@@ -555,6 +546,110 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                 }
             }
         }
+        //noise reduction and equalier.
+        if(jsonObj.contains("NRAEPara"))
+        {
+            //qDebug()<<"has NRAEPara";
+            QJsonValue val=jsonObj.take("NRAEPara");
+            //qDebug()<<val;
+            QByteArray baNRAEPara=val.toString().toUtf8();
+            //qDebug()<<baNRAEPara;
+            QJsonParseError err2;
+            QJsonDocument doc2=QJsonDocument::fromJson(baNRAEPara,&err2);
+            if(err2.error==QJsonParseError::NoError)
+            {
+                //qDebug()<<"no error";
+                QJsonArray array=doc2.array();
+                for(qint32 i=0;i<array.size();i++)
+                {
+                    QJsonObject obj=array.at(i).toObject();
+                    if(obj.contains("BandGain0"))
+                    {
+                        gGblPara.m_audio.m_nBandGain0=obj.value("BandGain0").toInt();
+                    }else if(obj.contains("BandGain1"))
+                    {
+                        gGblPara.m_audio.m_nBandGain1=obj.value("BandGain1").toInt();
+                    }else if(obj.contains("BandGain2"))
+                    {
+                        gGblPara.m_audio.m_nBandGain2=obj.value("BandGain2").toInt();
+                    }else if(obj.contains("BandGain3"))
+                    {
+                        gGblPara.m_audio.m_nBandGain3=obj.value("BandGain3").toInt();
+                    }else if(obj.contains("BandGain4"))
+                    {
+                        gGblPara.m_audio.m_nBandGain4=obj.value("BandGain4").toInt();
+                    }else if(obj.contains("BandGain5"))
+                    {
+                        gGblPara.m_audio.m_nBandGain5=obj.value("BandGain5").toInt();
+                    }else if(obj.contains("BandGain6"))
+                    {
+                        gGblPara.m_audio.m_nBandGain6=obj.value("BandGain6").toInt();
+                    }else if(obj.contains("BandGain7"))
+                    {
+                        gGblPara.m_audio.m_nBandGain7=obj.value("BandGain7").toInt();
+                    }else if(obj.contains("EnhanceStyle"))
+                    {
+                        gGblPara.m_audio.m_nEnhanceStyle=obj.value("EnhanceStyle").toInt();
+                    }else if(obj.contains("EnhanceGrade"))
+                    {
+                        gGblPara.m_audio.m_nEnhanceGrade=obj.value("EnhanceGrade").toInt();
+                    }else if(obj.contains("DenoiseGrade"))
+                    {
+                        gGblPara.m_audio.m_nDenoiseGrade=obj.value("DenoiseGrade").toInt();
+                    }else if(obj.contains("PreEnhance"))
+                    {
+                        //qDebug()<<obj.value("PreEnhance").toBool();
+                        if(obj.value("PreEnhance").toBool())
+                        {
+                            gGblPara.m_audio.m_bPreEnhance=true;
+                        }else{
+                            gGblPara.m_audio.m_bPreEnhance=false;
+                        }
+
+                    }
+                }
+                gGblPara.m_audio.m_bNsProfessionalFlag=true;
+                /*
+                qDebug()<<"NRAE:"<<gGblPara.m_audio.m_nBandGain0 \
+                       <<gGblPara.m_audio.m_nBandGain1 \
+                      <<gGblPara.m_audio.m_nBandGain2 \
+                     <<gGblPara.m_audio.m_nBandGain3 \
+                    <<gGblPara.m_audio.m_nBandGain4 \
+                   <<gGblPara.m_audio.m_nBandGain5 \
+                  <<gGblPara.m_audio.m_nBandGain6 \
+                 <<gGblPara.m_audio.m_nBandGain7 \
+                <<gGblPara.m_audio.m_nEnhanceStyle \
+                <<gGblPara.m_audio.m_nEnhanceGrade \
+                <<gGblPara.m_audio.m_nDenoiseGrade \
+                <<gGblPara.m_audio.m_bPreEnhance;
+                */
+
+
+                //generate feedback json data.
+                QJsonObject jsonObjFeedBackNRAE;
+                jsonObjFeedBackNRAE.insert("BandGain0",QString("%1").arg(gGblPara.m_audio.m_nBandGain0));
+                jsonObjFeedBackNRAE.insert("BandGain1",QString("%1").arg(gGblPara.m_audio.m_nBandGain1));
+                jsonObjFeedBackNRAE.insert("BandGain2",QString("%1").arg(gGblPara.m_audio.m_nBandGain2));
+                jsonObjFeedBackNRAE.insert("BandGain3",QString("%1").arg(gGblPara.m_audio.m_nBandGain3));
+                jsonObjFeedBackNRAE.insert("BandGain4",QString("%1").arg(gGblPara.m_audio.m_nBandGain4));
+                jsonObjFeedBackNRAE.insert("BandGain5",QString("%1").arg(gGblPara.m_audio.m_nBandGain5));
+                jsonObjFeedBackNRAE.insert("BandGain6",QString("%1").arg(gGblPara.m_audio.m_nBandGain6));
+                jsonObjFeedBackNRAE.insert("BandGain7",QString("%1").arg(gGblPara.m_audio.m_nBandGain7));
+                jsonObjFeedBackNRAE.insert("EnhanceStyle",QString("%1").arg(gGblPara.m_audio.m_nEnhanceStyle));
+                jsonObjFeedBackNRAE.insert("EnhanceGrade",QString("%1").arg(gGblPara.m_audio.m_nEnhanceGrade));
+                jsonObjFeedBackNRAE.insert("DenoiseGrade",QString("%1").arg(gGblPara.m_audio.m_nDenoiseGrade));
+                if(gGblPara.m_audio.m_bPreEnhance)
+                {
+                    jsonObjFeedBackNRAE.insert("PreEnhance","true");
+                }else{
+                    jsonObjFeedBackNRAE.insert("PreEnhance","false");
+                }
+                jsonObjFeedBack.insert("NRAEPara",jsonObjFeedBackNRAE);
+            }else{
+                qDebug()<<"has error";
+            }
+        }
+
         if(bWrCfgFileFlag)
         {
             gGblPara.writeCfgFile();

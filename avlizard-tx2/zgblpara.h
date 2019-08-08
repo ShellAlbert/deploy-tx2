@@ -132,6 +132,21 @@ public:
 
     //for noise view.
     qint32 m_nRNNoiseView;
+
+    //libns_professional 2019/6/27.
+    qint8 m_nBandGain0;
+    qint8 m_nBandGain1;
+    qint8 m_nBandGain2;
+    qint8 m_nBandGain3;
+    qint8 m_nBandGain4;
+    qint8 m_nBandGain5;
+    qint8 m_nBandGain6;
+    qint8 m_nBandGain7;
+    qint32 m_nEnhanceStyle;
+    qint32 m_nEnhanceGrade;
+    qint32 m_nDenoiseGrade;
+    bool m_bPreEnhance;
+    bool m_bNsProfessionalFlag;
 };
 
 class ZGblPara
@@ -145,7 +160,6 @@ public:
     void int32_char8x2_low(qint32 int32,char *char8x2);
     void int32_char8x4(qint32 int32,char *char8x4);
 
-    qint32 writePid2File();
     void readCfgFile();
     void writeCfgFile();
     void resetCfgFile();
@@ -186,24 +200,10 @@ public:
     //the global request to exit flag.
     //it will cause every thread occurs errors.
     bool m_bGblRst2Exit;
-public:
-//    //主摄像头采集线程.
-//    bool m_bMainCapThreadExitFlag;
-//    bool m_bMainExCapThreadExitFlag;
 
 public:
-//    //辅摄像头采集线程.
-//    bool m_bAuxCapThreadExitFlag;
-
-public:
-//    //图像比对处理线程.
-//    bool m_bImgCmpThreadExitFlag;
-
-public:
-//    //图像传输线程.
-//    bool m_bVideoTxThreadExitFlag;
-    bool m_bVideoTcpConnected;
-    bool m_bVideoTcpConnected2;
+    //accumulated run seconds.
+    qint64 m_nAccumulatedSec;
 
 public:
     //Android(tcp) <--> STM32(uart) 串口透传线程相关.
@@ -214,27 +214,14 @@ public:
     qint64 m_nUart2TcpBytes;
 
 public:
-    //控制端口线程.
-    bool m_bCtlThreadExitFlag;
-    bool m_bCtlClientConnected;
+    //json thread.
+    bool m_bJsonConnected;
+    //image processing on flag.
+    bool m_bJsonImgProOn;
 
-
-public:
-    //JSON协议控制标志位.
-    bool m_bJsonImgPro;//ImgPro图像比对启停控制标志位.
-    bool m_bJsonFlushUIImg;//是否刷新本地UI.
-    bool m_bJsonFlushUIWav;
 public:
     //audio related parameters.
     ZAudioParam m_audio;
-public:
-    //accumulated run seconds.
-    qint64 m_nAccumulatedSec;
-
-
-public:
-    qint64 m_nTx6803Cnt;
-    qint64 m_nTx6805Cnt;
 };
 extern ZGblPara gGblPara;
 
@@ -243,15 +230,11 @@ extern QByteArray qint32ToQByteArray(qint32 val);
 extern qint32 QByteArrayToqint32(QByteArray ba);
 
 
-#define _CURRENT_DATETIME_    QDateTime::currentDateTime().toString("[yyyy/MM/dd hh:mm:ss]")
+//#define _CURRENT_DATETIME_    QDateTime::currentDateTime().toString("[yyyy/MM/dd hh:mm:ss]")
 
 
 #define MAX_AUDIO_RING_BUFFER  (30)
 #define MAX_VIDEO_RING_BUFFER  (30)
-
-
-
-
 
 
 #endif // ZGBLPARA_H

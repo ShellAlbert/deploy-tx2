@@ -38,6 +38,21 @@ ZAudioParam::ZAudioParam()
     //default webRTC grade is 0.
     //valid range is 0.1.2.
     this->m_nWebRtcNsPolicy=0;
+
+    //libns_professional 2019/6/27.
+    this->m_nBandGain0=0;
+    this->m_nBandGain1=0;
+    this->m_nBandGain2=0;
+    this->m_nBandGain3=0;
+    this->m_nBandGain4=0;
+    this->m_nBandGain5=0;
+    this->m_nBandGain6=0;
+    this->m_nBandGain7=0;
+    this->m_nEnhanceStyle=0;
+    this->m_nEnhanceGrade=0;
+    this->m_nDenoiseGrade=0;
+    this->m_bPreEnhance=false;
+    this->m_bNsProfessionalFlag=false;
 }
 ZGblPara::ZGblPara()
 {
@@ -52,55 +67,20 @@ ZGblPara::ZGblPara()
     this->m_bFMode=false;
 
     this->m_bGblRst2Exit=false;
+    this->m_nAccumulatedSec=0;
 
-//    this->m_bMainCapThreadExitFlag=false;
-//    this->m_bAuxCapThreadExitFlag=false;
-//    this->m_bImgCmpThreadExitFlag=false;
-//    this->m_bVideoTxThreadExitFlag=false;
     //Tcp2Uart thread exit flag.
-    this->m_bTcp2UartThreadExitFlag=false;
-
-    this->m_bVideoTcpConnected=false;
-    this->m_bVideoTcpConnected2=false;
     this->m_bTcp2UartConnected=false;
     this->m_nTcp2UartBytes=0;
     this->m_nUart2TcpBytes=0;
 
 
-    //控制端口线程.
-    this->m_bCtlThreadExitFlag=false;
-    this->m_bCtlClientConnected=false;
-
-    //json control flags.
-    this->m_bJsonImgPro=false;
-    this->m_bJsonFlushUIImg=false;
-    this->m_bJsonFlushUIWav=false;
-
-    //accumulated run seconds.
-    this->m_nAccumulatedSec=0;
-
-    this->m_nTx6803Cnt=0;
-    this->m_nTx6805Cnt=0;
+    //json thread.
+    this->m_bJsonConnected=false;
+    this->m_bJsonImgProOn=false;
 }
 ZGblPara::~ZGblPara()
 {
-}
-qint32 ZGblPara::writePid2File()
-{
-    //write pid to file.
-    QFile filePID("/tmp/AVLizard.pid");
-    if(!filePID.open(QIODevice::WriteOnly))
-    {
-        qDebug()<<"<error>:error to write pid file."<<filePID.errorString();
-        return -1;
-    }
-    char pidBuffer[32];
-    memset(pidBuffer,0,sizeof(pidBuffer));
-    sprintf(pidBuffer,"%d",getpid());
-    filePID.write(pidBuffer,strlen(pidBuffer));
-    filePID.close();
-    qDebug()<<"write pid to /tmp/AVLizard.pid,"<<getpid()<<".";
-    return 0;
 }
 void ZGblPara::readCfgFile()
 {

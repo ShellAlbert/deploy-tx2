@@ -1,6 +1,7 @@
 #include <QDebug>
 #include <QDateTime>
 #include <QSettings>
+#include <QFile>
 #include <QCoreApplication>
 
 #include <signal.h>
@@ -63,6 +64,22 @@ int main(int argc, char *argv[])
     //Set the signal callback for Ctrl-C
     signal(SIGINT,gSIGHandler);
 
+    //write pid to file.
+    QFile filePID("/tmp/ZAudioServer.pid");
+    if(!filePID.open(QIODevice::WriteOnly))
+    {
+        qDebug()<<"<error>:error to write pid file."<<filePID.errorString();
+        return -1;
+    }
+    char pidBuffer[32];
+    memset(pidBuffer,0,sizeof(pidBuffer));
+    sprintf(pidBuffer,"%d",getpid());
+    filePID.write(pidBuffer,strlen(pidBuffer));
+    filePID.close();
+    qDebug()<<"write pid to /tmp/ZAudioServer.pid,"<<pidBuffer<<".";
+
+
+    //enter event loop until exit() was called.
     ret=a.exec();
 
     while(!task->ZIsExitCleanup())

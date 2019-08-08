@@ -2,7 +2,7 @@
 #include "zgblpara.h"
 #include <QDebug>
 #include <QFile>
-#include "libns.h"
+#include "../libns/libns.h"
 #define FRAME_SIZE_SHIFT 2
 #define FRAME_SIZE (120<<FRAME_SIZE_SHIFT)
 
@@ -75,17 +75,6 @@ bool ZNoiseCutThread::ZIsExitCleanup()
 }
 void ZNoiseCutThread::run()
 {
-    //initial libns.
-//    if(ns_init()<0)
-//    {
-//        qDebug()<<"<Error>:failed to init libns.";
-//        //set global request to exit flag to cause other threads to exit.
-//        gGblPara.m_bGblRst2Exit=true;
-//        return;
-//    }
-
-
-
     //WebRTC.
     //use this variable to control webRtc noiseSuppression grade.
     //valid range is 0,1,2.default is 0.
@@ -155,19 +144,6 @@ void ZNoiseCutThread::run()
     //这个变量用于控制通过json动态调整增益.
     qint32 nGaindBShadow=gGblPara.m_audio.m_nGaindB;
 
-    //bevis.
-    //    qint32 nBevisRemaingBytes=0;
-    //    _WINDNSManager bevis;
-    //    bevis.vp_init();
-    //    //de-noise grade:0/1/2/3.
-    //    bevis.vp_setwindnsmode(gGblPara.m_audio.m_nBevisGrade);
-
-    //    char *pRNNoiseBuffer=new char[FRAME_SIZE];
-    //    qint32 nRNNoiseBufLen=0;
-    //    //脏音频数据（未经过降噪处理的原始采样数据）.
-    //    QByteArray *baPCMData=new QByteArray(BLOCK_SIZE,0);
-    //    qint32 nPCMDataLen=0;
-
     this->m_pcm16k=new char[PERIOD_SIZE];
     if(NULL==this->m_pcm16k)
     {
@@ -180,7 +156,26 @@ void ZNoiseCutThread::run()
 
     //for libns.
     qint32 nLibNsModeShadow=gGblPara.m_audio.m_nRNNoiseView;
+    //here call ns_init() or ns_custom_init() for call ns_uninit() later.
     ns_init(0);//0~5.
+    int denoiseAlgorithm = 3;
+    int denoiseLevel = 0;
+    int enhancedType = 0;
+    int enhancedLevel = 0;
+    char* customBandGains = NULL;
+    char preEmphasisFlag = 0;
+    customBandGains=new char[8];
+    memset(customBandGains,0,8);
+    if(ns_custom_init(denoiseAlgorithm, denoiseLevel, enhancedType, enhancedLevel, customBandGains, preEmphasisFlag))
+    {
+        qDebug()<<"<Error>:NoiseCut,failed to init ns_custom_init().";
+        //set global request to exit flag to cause other threads to exit.
+        gGblPara.m_bGblRst2Exit=true;
+        return;
+    }
+
+
+    //the main loop.
     while(!gGblPara.m_bGblRst2Exit)
     {
 #if 1
@@ -313,11 +308,39 @@ void ZNoiseCutThread::run()
             break;
         case 2:
             //qDebug()<<"DeNoise:WebRTC Enabled";
+        {
+            ns_uninit();
+            char customBandGains[8]={0};
+            ns_custom_init(6,gGblPara.m_audio.m_nDenoiseGrade,0,0,customBandGains,0);
+        }
             this->ZCutNoiseByWebRTC(pcmIn);
             break;
         case 3:
-            //qDebug()<<"DeNoise:libns Enabled";
-            ns_processing(pcmIn->data(),pcmIn->size());
+            //qDebug()<<"DeNoise:Bevis Enabled";
+            //this->ZCutNoiseByBevis(pcmIn);
+            break;
+        case 4:
+            //logMMSE.
+            //this->ZCutNoiseByLogMMSE(pcmIn);
+            break;
+        case 5:
+            //NRAE.
+            if(gGblPara.m_audio.m_bNsProfessionalFlag)
+            {
+                ns_uninit();
+                qint8 customBandGains[8]={gGblPara.m_audio.m_nBandGain0,///<
+                                         gGblPara.m_audio.m_nBandGain1,///<
+                                         gGblPara.m_audio.m_nBandGain2,///<
+                                         gGblPara.m_audio.m_nBandGain3,///<
+                                         gGblPara.m_audio.m_nBandGain4,///<
+                                         gGblPara.m_audio.m_nBandGain5,///<
+                                         gGblPara.m_audio.m_nBandGain6,///<
+                                         gGblPara.m_audio.m_nBandGain7};
+                ns_custom_init(3,gGblPara.m_audio.m_nDenoiseGrade,gGblPara.m_audio.m_nEnhanceStyle,///<
+                               gGblPara.m_audio.m_nEnhanceGrade,(char*)customBandGains,gGblPara.m_audio.m_bPreEnhance?1:0);
+                gGblPara.m_audio.m_bNsProfessionalFlag=false;
+            }
+            this->ZCutNoiseByRNNoise(pcmIn);
             break;
         default:
             break;
@@ -396,8 +419,6 @@ void ZNoiseCutThread::run()
     WebRtcNs_Free(this->m_pNS_inst);
     WebRtcAgc_Free(this->m_agcHandle);
     delete [] this->m_pcm16k;
-    //    bevis.vp_uninit();
-    //    delete [] pFilterBuffer;
 
     //uninit libns.
     ns_uninit();
@@ -428,7 +449,17 @@ qint32 ZNoiseCutThread::ZCutNoiseByRNNoise(QByteArray *baPCM)
 //WebRTC.
 qint32 ZNoiseCutThread::ZCutNoiseByWebRTC(QByteArray *baPCM)
 {
-#if 1
+    //because original pcm data is 48000 bytes.
+    //libns only process 960 bytes each time.
+    //so 48000/960=50.
+    qint32 nOffset=0;
+    for(qint32 i=0;i<50;i++)
+    {
+        char *pPcmAudio=baPCM->data()+nOffset;
+        ns_processing(pPcmAudio,960);
+        nOffset+=960;
+    }
+#if 0
     //48khz downsample to 16khz,so data is decrease 3.
     //we dump data from baPCM to m_pcm16k.
     qint32 nOffset16k=0;
@@ -447,9 +478,9 @@ qint32 ZNoiseCutThread::ZCutNoiseByWebRTC(QByteArray *baPCM)
         nOffset16k+=sizeof(tmpOut);
     }
     //qDebug()<<"48khz-16khz okay,bytes:"<<nOffset16k;
-#endif
+
     ////////////////////////////////////////////////////////////
-#if 1
+
     int i;
     //    char *pcmData=baPCM->data();
     //    qint32 nPCMDataLen=baPCM->size();
@@ -476,9 +507,9 @@ qint32 ZNoiseCutThread::ZCutNoiseByWebRTC(QByteArray *baPCM)
             }
         }
     }
-#endif
 
-#if 1
+
+
     //processing finished,we dump data from m_pcm16k to baPCM.
     //16000/(160*2)=50.
     qint32 xTmpOffset=0;
