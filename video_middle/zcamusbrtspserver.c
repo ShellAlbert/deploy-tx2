@@ -9,6 +9,11 @@
 
 #include <gst/gst.h>
 #include <gst/rtsp-server/rtsp-server.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #define DEFAULT_RTSP_PORT "6807"
 #define PIPE_LINE " ( v4l2src device=/dev/video1 ! video/x-raw,width=(int)640,height=(int)480,framerate=(fraction)30/1 ! queue ! nvvidconv ! omxh264enc ! rtph264pay name=pay0 pt=96 )"
@@ -28,7 +33,26 @@ int main(int argc,char *argv[])
   GstRTSPMediaFactory *factory;
   GOptionContext *optctx;
   GError *error = NULL;
-  
+  int fd;
+  char buffer[64];
+
+  //create pid file.
+  fd=open("/tmp/ZCamUsbRtspServer.pid",O_CREAT|O_TRUNC|O_WRONLY,0644);
+  if(fd<0)
+  {
+      printf("<error>:failed to create /tmp/ZCamUsbRtspServer.pid file.");
+      return -1;
+  }
+  memset(buffer,0,sizeof(buffer));
+  sprintf(buffer,"%d",getpid());
+  if(write(fd,buffer,strlen(buffer))<0)
+  {
+      printf("<error>:failed to write /tmp/ZCamUsbRtspServer.pid file.");
+      return -1;
+  }
+  close(fd);
+
+  //execute GStreamer.
   gst_init(NULL,NULL);
 
 #if 0
@@ -64,8 +88,8 @@ int main(int argc,char *argv[])
   gst_rtsp_media_factory_set_launch (factory, PIPE_LINE/*argv[1]*/);
   gst_rtsp_media_factory_set_shared (factory, TRUE);
 
-  /* attach the test factory to the /test url */
-  gst_rtsp_mount_points_add_factory (mounts, "/test", factory);
+  /* attach the test factory to the /stream url */
+  gst_rtsp_mount_points_add_factory (mounts, "/stream", factory);
 
   /* don't need the ref to the mapper anymore */
   g_object_unref (mounts);
@@ -74,7 +98,7 @@ int main(int argc,char *argv[])
   gst_rtsp_server_attach (server, NULL);
 
   /* start serving */
-  g_print ("stream ready at rtsp://127.0.0.1:%s/test\n", port);
+  g_print ("stream ready at rtsp://127.0.0.1:%s/stream\n", port);
   g_main_loop_run (loop);
 
   return 0;
