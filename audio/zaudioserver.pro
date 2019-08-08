@@ -54,7 +54,10 @@ SOURCES += main.cpp \
     webrtc/spl_sqrt_floor.c \
     webrtc/splitting_filter.c \
     webrtc/vector_scaling_operations.c \
-    libns.c
+    libns.c \
+    json/zjsonthread.cpp \
+    forward/ztcp2uartthread.cpp
+
 
 HEADERS += \
     webrtc/analog_agc.h \
@@ -82,6 +85,8 @@ HEADERS += \
     zaudioplaythread.h \
     zaudiotask.h \
     zaudiotxthread.h \
-    znoisecutthread.h
+    znoisecutthread.h \
+    json/zjsonthread.h \
+    forward/ztcp2uartthread.h
 
 LIBS += -lasound -lopus

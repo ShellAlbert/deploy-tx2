@@ -11,6 +11,8 @@
 #include <unistd.h>
 
 #include "zaudiotask.h"
+#include "forward/ztcp2uartthread.h"
+#include "json/zjsonthread.h"
 #include "zgblpara.h"
 void gSIGHandler(int sigNo)
 {
@@ -33,10 +35,27 @@ int main(int argc, char *argv[])
     int ret;
     QCoreApplication a(argc, argv);
 
+    //1.audio thread: capture -> noise suppression -> tx & play.
     ZAudioTask *task=new ZAudioTask;
     if(task->ZStartTask()<0)
     {
         qDebug()<<"<error>:failed to start audio task!";
+        return -1;
+    }
+
+    //2.tcp to uart forward thread.
+    ZTcp2UartForwardThread *tcp2uart=new ZTcp2UartForwardThread;
+    if(tcp2uart->ZStartThread()<0)
+    {
+        qDebug()<<"<error>:failed to start tcp2uart thread!";
+        return -1;
+    }
+
+    //3.json control thread.
+    ZJsonThread *json=new ZJsonThread;
+    if(json->ZStartThread()<0)
+    {
+        qDebug()<<"<error>:failed to start json thread!";
         return -1;
     }
 
@@ -50,8 +69,15 @@ int main(int argc, char *argv[])
     {
         qDebug()<<"<exit>:waiting for threads...";
     }
+
     delete task;
     task=NULL;
+
+    delete tcp2uart;
+    tcp2uart=NULL;
+
+    delete json;
+    json=NULL;
 
     qDebug()<<"<exit>:done.";
     return ret;

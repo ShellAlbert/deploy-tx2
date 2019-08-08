@@ -99,11 +99,6 @@ class ZAudioParam
 {
 public:
     ZAudioParam();
-public:
-    //capture card name.
-    QString m_capCardName;
-    //play card name.
-    QString m_playCardName;
 
 public:
     //run mode.
@@ -178,11 +173,6 @@ public:
     //cut template size.
     qint32 m_nCutTemplateWidth;
     qint32 m_nCutTemplateHeight;
-
-    //uart name.
-    //because /dev/ttyS0~ttyS4 are not work well.
-    //so we use /dev/ttyFIQ0 now.
-    QString m_uartName;
 public:
     bool m_bDebugMode;
     bool m_bDumpCamInfo2File;

@@ -128,17 +128,6 @@ void ZGblPara::readCfgFile()
     gGblPara.m_nCutTemplateWidth=iniFile.value("width",0).toInt();
     gGblPara.m_nCutTemplateHeight=iniFile.value("height",0).toInt();
     iniFile.endGroup();
-    iniFile.beginGroup("UART");
-    gGblPara.m_uartName=iniFile.value("name","ttyS4").toString();
-    iniFile.endGroup();
-
-    iniFile.beginGroup("Capture");
-    this->m_audio.m_capCardName=iniFile.value("Name","plughw:CARD=USB20,DEV=0").toString();
-    iniFile.endGroup();
-
-    iniFile.beginGroup("Playback");
-    this->m_audio.m_playCardName=iniFile.value("Name","plughw:CARD=USB20,DEV=1").toString();
-    iniFile.endGroup();
 
 #if 0
     if(1)
@@ -182,17 +171,6 @@ void ZGblPara::writeCfgFile()
     iniFile.setValue("height",gGblPara.m_nCutTemplateHeight);
     iniFile.endGroup();
 
-    iniFile.beginGroup("UART");
-    iniFile.setValue("name",gGblPara.m_uartName);
-    iniFile.endGroup();
-
-    iniFile.beginGroup("Capture");
-    iniFile.setValue("Name",this->m_audio.m_capCardName);
-    iniFile.endGroup();
-
-    iniFile.beginGroup("Playback");
-    iniFile.setValue("Name",this->m_audio.m_playCardName);
-    iniFile.endGroup();
 }
 void ZGblPara::resetCfgFile()
 {
@@ -212,12 +190,6 @@ void ZGblPara::resetCfgFile()
 
     gGblPara.m_nCutTemplateWidth=200;
     gGblPara.m_nCutTemplateHeight=200;
-
-    gGblPara.m_uartName=QString("ttyS4");
-
-    //audio.
-    this->m_audio.m_capCardName=QString("plughw:CARD=PCH,DEV=0");
-    this->m_audio.m_playCardName=QString("plughw:CARD=PCH,DEV=0");
 
     this->writeCfgFile();
 }

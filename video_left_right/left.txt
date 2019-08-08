@@ -1,1 +1,15 @@
 rtsp://192.168.137.10:554/user=admin&password=&channel=1&stream=0.sdp?real_stream --rtp-caching=100
+
+zhangshaoyan@WHTechX1:~/tx2deploy/deploy-tx2/video_left_right$ sudo cat /proc/sys/net/ipv4/ip_forward
+1
+zhangshaoyan@WHTechX1:~/tx2deploy/deploy-tx2/video_left_right$ route 
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+default         localhost       0.0.0.0         UG    100    0        0 eth0
+default         localhost       0.0.0.0         UG    32766  0        0 l4tbr0
+10.42.0.0       0.0.0.0         255.255.255.0   U     600    0        0 wlan0  //make sure here ip.
+link-local      0.0.0.0         255.255.0.0     U     1000   0        0 l4tbr0
+192.168.55.0    0.0.0.0         255.255.255.0   U     0      0        0 l4tbr0
+192.168.137.0   0.0.0.0         255.255.255.0   U     100    0        0 eth0  //make sure here ip.
+zhangshaoyan@WHTechX1:~/tx2deploy/deploy-tx2/video_left_right$ 
+
