@@ -1,8 +1,14 @@
-#include <QDebug>
+/**
+  * project code: p16
+  * config file: p16.ini
+  *
+  *
+  */
+#include <QApplication>
 #include <QDateTime>
 #include <QSettings>
 #include <QFile>
-#include <QCoreApplication>
+#include <QDebug>
 
 #include <signal.h>
 #include <pthread.h>
@@ -34,7 +40,7 @@ void gSIGHandler(int sigNo)
 int main(int argc, char *argv[])
 {
     int ret;
-    QCoreApplication a(argc, argv);
+    QApplication p16(argc, argv);
 
     //1.audio thread: capture -> noise suppression -> tx & play.
     ZAudioTask *task=new ZAudioTask;
@@ -80,7 +86,7 @@ int main(int argc, char *argv[])
 
 
     //enter event loop until exit() was called.
-    ret=a.exec();
+    ret=p16.exec();
 
     while(!task->ZIsExitCleanup())
     {

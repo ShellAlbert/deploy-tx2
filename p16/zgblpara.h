@@ -107,17 +107,12 @@ public:
     //1 at default.
     qint32 m_runMode;
 
-    //capture audio sample rate.
-    qint32 m_nCaptureSampleRate;
-    //playback audio sample rate.
-    qint32 m_nPlaybackSampleRate;
     //channel number for capture & playback.
     qint32 m_nChannelNum;
     //de-noise control.
     qint32 m_nDeNoiseMethod;
 
     qint32 m_nGaindB;
-    qint32 m_nBevisGrade;
     //default webRTC grade.0,1,2.
     qint32 m_nWebRtcNsPolicy;
 public:
@@ -164,25 +159,16 @@ public:
     void writeCfgFile();
     void resetCfgFile();
 public:
-    //(x1,y1) center of camera1.
-    qint32 m_calibrateX1;
-    qint32 m_calibrateY1;
-    //(x2,y2) center of camera2.
-    qint32 m_calibrateX2;
-    qint32 m_calibrateY2;
+    //(x1,y1) calibrate center of camera1.
+    qint32 m_calCenterX1;
+    qint32 m_calCenterY1;
+    //(x2,y2) calibrate center of camera2.
+    qint32 m_calCenterX2;
+    qint32 m_calCenterY2;
 
-    //(x3,y3) center of camera2.
-    qint32 m_calibrateX3;
-    qint32 m_calibrateY3;
-
-    //cam1 setting parameters.
-    qint32 m_widthCAM1;
-    qint32 m_heightCAM1;
-    qint32 m_fpsCAM1;
-    //cam2 setting parameters.
-    qint32 m_widthCAM2;
-    qint32 m_heightCAM2;
-    qint32 m_fpsCAM2;
+    //(x3,y3) calibrate center of camera3.
+    qint32 m_calCenterX3;
+    qint32 m_calCenterY3;
 
     //cut template size.
     qint32 m_nCutTemplateWidth;

@@ -298,48 +298,6 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                 }
             }
         }
-        if(jsonObj.contains("BevisGrade"))
-        {
-            QJsonValue val=jsonObj.take("BevisGrade");
-            if(val.isString())
-            {
-                QString bevisGrade=val.toVariant().toString();
-                //qDebug()<<"bevisGrade:"<<bevisGrade;
-                if(bevisGrade=="0")
-                {
-                    gGblPara.m_audio.m_nBevisGrade=1;
-                }else if(bevisGrade=="1")
-                {
-                    gGblPara.m_audio.m_nBevisGrade=2;
-                }else if(bevisGrade=="2")
-                {
-                    gGblPara.m_audio.m_nBevisGrade=3;
-                }else if(bevisGrade=="3")
-                {
-                    gGblPara.m_audio.m_nBevisGrade=4;
-                }else if(bevisGrade=="query")
-                {
-                    //仅用于查询当前状态.
-                }
-                switch(gGblPara.m_audio.m_nBevisGrade)
-                {
-                case 1:
-                    jsonObjFeedBack.insert("BevisGrade","0");
-                    break;
-                case 2:
-                    jsonObjFeedBack.insert("BevisGrade","1");
-                    break;
-                case 3:
-                    jsonObjFeedBack.insert("BevisGrade","2");
-                    break;
-                case 4:
-                    jsonObjFeedBack.insert("BevisGrade","3");
-                    break;
-                default:
-                    break;
-                }
-            }
-        }
         if(jsonObj.contains("WebRtcGrade"))
         {
             QJsonValue val=jsonObj.take("WebRtcGrade");
@@ -360,7 +318,7 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                 {
                     //仅用于查询当前状态.
                 }
-                switch(gGblPara.m_audio.m_nBevisGrade)
+                switch(gGblPara.m_audio.m_nWebRtcNsPolicy)
                 {
                 case 0:
                     jsonObjFeedBack.insert("WebRtcGrade","0");
@@ -401,7 +359,7 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                 QString cam1CenterXY=val.toVariant().toString();
                 if(cam1CenterXY=="query")
                 {
-                    jsonObjFeedBack.insert("Cam1CenterXY",QString("%1,%2").arg(gGblPara.m_calibrateX1).arg(gGblPara.m_calibrateY1));
+                    jsonObjFeedBack.insert("Cam1CenterXY",QString("%1,%2").arg(gGblPara.m_calCenterX1).arg(gGblPara.m_calCenterY1));
                 }else{
                     QStringList xyList=cam1CenterXY.split(",");
                     if(xyList.size()!=2)
@@ -410,10 +368,10 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                     }else{
                         qint32 x=xyList.at(0).toInt();
                         qint32 y=xyList.at(1).toInt();
-                        gGblPara.m_calibrateX1=x;
-                        gGblPara.m_calibrateY1=y;
+                        gGblPara.m_calCenterX1=x;
+                        gGblPara.m_calCenterY1=y;
                         bWrCfgFileFlag=true;
-                        jsonObjFeedBack.insert("Cam1CenterXY",QString("%1,%2").arg(gGblPara.m_calibrateX1).arg(gGblPara.m_calibrateY1));
+                        jsonObjFeedBack.insert("Cam1CenterXY",QString("%1,%2").arg(gGblPara.m_calCenterX1).arg(gGblPara.m_calCenterY1));
                     }
                 }
             }
@@ -426,7 +384,7 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                 QString cam2CenterXY=val.toVariant().toString();
                 if(cam2CenterXY=="query")
                 {
-                    jsonObjFeedBack.insert("Cam2CenterXY",QString("%1,%2").arg(gGblPara.m_calibrateX2).arg(gGblPara.m_calibrateY2));
+                    jsonObjFeedBack.insert("Cam2CenterXY",QString("%1,%2").arg(gGblPara.m_calCenterX2).arg(gGblPara.m_calCenterY2));
                 }else{
                     QStringList xyList=cam2CenterXY.split(",");
                     if(xyList.size()!=2)
@@ -435,10 +393,10 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                     }else{
                         qint32 x=xyList.at(0).toInt();
                         qint32 y=xyList.at(1).toInt();
-                        gGblPara.m_calibrateX2=x;
-                        gGblPara.m_calibrateY2=y;
+                        gGblPara.m_calCenterX2=x;
+                        gGblPara.m_calCenterY2=y;
                         bWrCfgFileFlag=true;
-                        jsonObjFeedBack.insert("Cam2CenterXY",QString("%1,%2").arg(gGblPara.m_calibrateX2).arg(gGblPara.m_calibrateY2));
+                        jsonObjFeedBack.insert("Cam2CenterXY",QString("%1,%2").arg(gGblPara.m_calCenterX2).arg(gGblPara.m_calCenterY2));
                     }
                 }
             }
@@ -451,7 +409,7 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                 QString cam3CenterXY=val.toVariant().toString();
                 if(cam3CenterXY=="query")
                 {
-                    jsonObjFeedBack.insert("Cam3CenterXY",QString("%1,%2").arg(gGblPara.m_calibrateX3).arg(gGblPara.m_calibrateY3));
+                    jsonObjFeedBack.insert("Cam3CenterXY",QString("%1,%2").arg(gGblPara.m_calCenterX3).arg(gGblPara.m_calCenterY3));
                 }else{
                     QStringList xyList=cam3CenterXY.split(",");
                     if(xyList.size()!=2)
@@ -460,10 +418,10 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                     }else{
                         qint32 x=xyList.at(0).toInt();
                         qint32 y=xyList.at(1).toInt();
-                        gGblPara.m_calibrateX3=x;
-                        gGblPara.m_calibrateY3=y;
+                        gGblPara.m_calCenterX3=x;
+                        gGblPara.m_calCenterY3=y;
                         bWrCfgFileFlag=true;
-                        jsonObjFeedBack.insert("Cam3CenterXY",QString("%1,%2").arg(gGblPara.m_calibrateX3).arg(gGblPara.m_calibrateY3));
+                        jsonObjFeedBack.insert("Cam3CenterXY",QString("%1,%2").arg(gGblPara.m_calCenterX3).arg(gGblPara.m_calCenterY3));
                     }
                 }
             }

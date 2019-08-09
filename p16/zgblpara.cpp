@@ -13,17 +13,13 @@ ZAudioParam::ZAudioParam()
     //1 at default.
     this->m_runMode=1;
 
-    //capture audio sample rate.
-    this->m_nCaptureSampleRate=48000;
-    //playback audio sample rate.
-    this->m_nPlaybackSampleRate=48000;
     //channel number for capture & playback.
     this->m_nChannelNum=2;
     //de-noise control.
     this->m_nDeNoiseMethod=0;
 
     this->m_nGaindB=0;
-    this->m_nBevisGrade=1;
+
     //capture thread thread buffer overrun.
     this->m_nCapOverrun=0;
     //playback thread buffer underrun.
@@ -69,7 +65,7 @@ ZGblPara::ZGblPara()
     this->m_bGblRst2Exit=false;
     this->m_nAccumulatedSec=0;
 
-    //Tcp2Uart thread exit flag.
+    //Tcp2Uart thread.
     this->m_bTcp2UartConnected=false;
     this->m_nTcp2UartBytes=0;
     this->m_nUart2TcpBytes=0;
@@ -85,65 +81,44 @@ ZGblPara::~ZGblPara()
 void ZGblPara::readCfgFile()
 {
     //read calibrate center.
-    QSettings iniFile("AVLizard.ini",QSettings::IniFormat);
+    QSettings iniFile("p16.ini",QSettings::IniFormat);
     iniFile.beginGroup("CAM1");
-    gGblPara.m_widthCAM1=iniFile.value("width",0).toInt();
-    gGblPara.m_heightCAM1=iniFile.value("height",0).toInt();
-    gGblPara.m_fpsCAM1=iniFile.value("fps",0).toInt();
-    gGblPara.m_calibrateX1=iniFile.value("x1",0).toInt();
-    gGblPara.m_calibrateY1=iniFile.value("y1",0).toInt();
+    gGblPara.m_calCenterX1=iniFile.value("x1",0).toInt();
+    gGblPara.m_calCenterY1=iniFile.value("y1",0).toInt();
     iniFile.endGroup();
+
     iniFile.beginGroup("CAM2");
-    gGblPara.m_widthCAM2=iniFile.value("width",0).toInt();
-    gGblPara.m_heightCAM2=iniFile.value("height",0).toInt();
-    gGblPara.m_fpsCAM2=iniFile.value("fps",0).toInt();
-    gGblPara.m_calibrateX2=iniFile.value("x2",0).toInt();
-    gGblPara.m_calibrateY2=iniFile.value("y2",0).toInt();
+    gGblPara.m_calCenterX2=iniFile.value("x2",0).toInt();
+    gGblPara.m_calCenterY2=iniFile.value("y2",0).toInt();
     iniFile.endGroup();
+
     iniFile.beginGroup("CAM3");
-    gGblPara.m_calibrateX3=iniFile.value("x3",0).toInt();
-    gGblPara.m_calibrateY3=iniFile.value("y3",0).toInt();
+    gGblPara.m_calCenterX3=iniFile.value("x3",0).toInt();
+    gGblPara.m_calCenterY3=iniFile.value("y3",0).toInt();
     iniFile.endGroup();
+
     iniFile.beginGroup("CuteTemplate");
     gGblPara.m_nCutTemplateWidth=iniFile.value("width",0).toInt();
     gGblPara.m_nCutTemplateHeight=iniFile.value("height",0).toInt();
     iniFile.endGroup();
-
-#if 0
-    if(1)
-    {
-        qDebug()<<"CAM1 parameters:";
-        qDebug()<<"resolution:"<<gGblPara.m_widthCAM1<<"*"<<gGblPara.m_heightCAM1<<",fps:"<<gGblPara.m_fpsCAM1;
-        qDebug()<<"calibrate center point ("<<gGblPara.m_calibrateX1<<","<<gGblPara.m_calibrateY1<<")";
-
-        qDebug()<<"CAM2 parameters:";
-        qDebug()<<"resolution:"<<gGblPara.m_widthCAM2<<"*"<<gGblPara.m_heightCAM2<<",fps:"<<gGblPara.m_fpsCAM2;
-        qDebug()<<"calibrate center point ("<<gGblPara.m_calibrateX2<<","<<gGblPara.m_calibrateY2<<")";
-        qDebug()<<"Cut Template size: ("<<gGblPara.m_nCutTemplateWidth<<"*"<<gGblPara.m_nCutTemplateHeight<<")";
-    }
-#endif
 }
 void ZGblPara::writeCfgFile()
 {
     //write calibrate center.
-    QSettings iniFile("AVLizard.ini",QSettings::IniFormat);
+    QSettings iniFile("p16.ini",QSettings::IniFormat);
     iniFile.beginGroup("CAM1");
-    iniFile.setValue("width",gGblPara.m_widthCAM1);
-    iniFile.setValue("height",gGblPara.m_heightCAM1);
-    iniFile.setValue("fps",gGblPara.m_fpsCAM1);
-    iniFile.setValue("x1",gGblPara.m_calibrateX1);
-    iniFile.setValue("y1",gGblPara.m_calibrateY1);
+    iniFile.setValue("x1",gGblPara.m_calCenterX1);
+    iniFile.setValue("y1",gGblPara.m_calCenterY1);
     iniFile.endGroup();
+
     iniFile.beginGroup("CAM2");
-    iniFile.setValue("width",gGblPara.m_widthCAM2);
-    iniFile.setValue("height",gGblPara.m_heightCAM2);
-    iniFile.setValue("fps",gGblPara.m_fpsCAM2);
-    iniFile.setValue("x2",gGblPara.m_calibrateX2);
-    iniFile.setValue("y2",gGblPara.m_calibrateY2);
+    iniFile.setValue("x2",gGblPara.m_calCenterX2);
+    iniFile.setValue("y2",gGblPara.m_calCenterY2);
     iniFile.endGroup();
+
     iniFile.beginGroup("CAM3");
-    iniFile.setValue("x3",gGblPara.m_calibrateX3);
-    iniFile.setValue("y3",gGblPara.m_calibrateY3);
+    iniFile.setValue("x3",gGblPara.m_calCenterX3);
+    iniFile.setValue("y3",gGblPara.m_calCenterY3);
     iniFile.endGroup();
 
     iniFile.beginGroup("CuteTemplate");
@@ -154,19 +129,11 @@ void ZGblPara::writeCfgFile()
 }
 void ZGblPara::resetCfgFile()
 {
-    gGblPara.m_widthCAM1=640;
-    gGblPara.m_heightCAM1=480;
-    gGblPara.m_fpsCAM1=15;
-    gGblPara.m_calibrateX1=320;
-    gGblPara.m_calibrateY1=240;
+    gGblPara.m_calCenterX1=0;
+    gGblPara.m_calCenterY1=0;
 
-
-    gGblPara.m_widthCAM2=640;
-    gGblPara.m_heightCAM2=480;
-    gGblPara.m_fpsCAM2=15;
-    gGblPara.m_calibrateX2=400;
-    gGblPara.m_calibrateY2=310;
-
+    gGblPara.m_calCenterX2=0;
+    gGblPara.m_calCenterY2=0;
 
     gGblPara.m_nCutTemplateWidth=200;
     gGblPara.m_nCutTemplateHeight=200;

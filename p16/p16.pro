@@ -1,8 +1,14 @@
-QT -= gui
+#QT -= gui
 
-QT += core serialport network script
-CONFIG += c++11 console
-CONFIG -= app_bundle
+QT += core gui serialport network script
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+#CONFIG += c++11 console
+#CONFIG -= app_bundle
+
+CONFIG += c++11
+TARGET = p16.bin
+TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked deprecated (the exact warnings
