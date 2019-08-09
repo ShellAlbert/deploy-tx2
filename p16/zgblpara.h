@@ -216,7 +216,10 @@ extern QByteArray qint32ToQByteArray(qint32 val);
 extern qint32 QByteArrayToqint32(QByteArray ba);
 
 
-//#define _CURRENT_DATETIME_    QDateTime::currentDateTime().toString("[yyyy/MM/dd hh:mm:ss]")
+#include <opencv2/opencv.hpp>
+#include <QImage>
+extern cv::Mat QImage2cvMat(const QImage &img);
+extern QImage cvMat2QImage(const cv::Mat &mat);
 
 
 #define MAX_AUDIO_RING_BUFFER  (30)

@@ -67,24 +67,20 @@ qint32 ZAudioTask::ZStartTask()
     //                                          -- tx queue --> Tcp Tx.
     this->m_capThread=new ZAudioCaptureThread("plughw:CARD=USBSA,DEV=0",false);
     this->m_capThread->ZBindFIFO(&this->m_Cap2NsFIFOFree,&this->m_Cap2NsFIFOUsed,&this->m_Cap2NsFIFOMutex,&this->m_condCap2NsFIFOEmpty,&this->m_condCap2NsFIFOFull);
-    QObject::connect(this->m_capThread,SIGNAL(ZSigThreadFinished()),this,SLOT(ZSlotHelpThreads2Exit()));
 
     //create noise cut thread.
     this->m_cutThread=new ZNoiseCutThread;
     this->m_cutThread->ZBindInFIFO(&this->m_Cap2NsFIFOFree,&this->m_Cap2NsFIFOUsed,&this->m_Cap2NsFIFOMutex,&this->m_condCap2NsFIFOEmpty,&this->m_condCap2NsFIFOFull);
     this->m_cutThread->ZBindOut1FIFO(&this->m_Ns2PbFIFOFree,&this->m_Ns2PbFIFOUsed,&this->m_Ns2PbFIFOMutex,&this->m_condNs2PbFIFOEmpty,&this->m_condNs2PbFIFOFull);
     this->m_cutThread->ZBindOut2FIFO(&this->m_Ns2TxFIFOFree,&this->m_Ns2TxFIFOUsed,&this->m_Ns2TxFIFOMutex,&this->m_condNs2TxFIFOEmpty,&this->m_condNs2TxFIFOFull);
-    QObject::connect(this->m_cutThread,SIGNAL(ZSigThreadFinished()),this,SLOT(ZSlotHelpThreads2Exit()));
 
     //create playback thread.
     this->m_playThread=new ZAudioPlayThread("plughw:CARD=USBSA,DEV=0");
     this->m_playThread->ZBindFIFO(&this->m_Ns2PbFIFOFree,&this->m_Ns2PbFIFOUsed,&this->m_Ns2PbFIFOMutex,&this->m_condNs2PbFIFOEmpty,&this->m_condNs2PbFIFOFull);
-    QObject::connect(this->m_playThread,SIGNAL(ZSigThreadFinished()),this,SLOT(ZSlotHelpThreads2Exit()));
 
     //tcp tx thread.
     this->m_txThread=new ZAudioTxThread;
     this->m_txThread->ZBindFIFO(&this->m_Ns2TxFIFOFree,&this->m_Ns2TxFIFOUsed,&this->m_Ns2TxFIFOMutex,&this->m_condNs2TxFIFOEmpty,&this->m_condNs2TxFIFOFull);
-    QObject::connect(this->m_txThread,SIGNAL(ZSigThreadFinished()),this,SLOT(ZSlotHelpThreads2Exit()));
 
     //start thread.
     this->m_capThread->ZStartThread();
@@ -93,11 +89,7 @@ qint32 ZAudioTask::ZStartTask()
     this->m_txThread->ZStartThread();
     return 0;
 }
-ZNoiseCutThread* ZAudioTask::ZGetNoiseCutThread()
-{
-    return this->m_cutThread;
-}
-void ZAudioTask::ZSlotHelpThreads2Exit()
+void ZAudioTask::ZSlotHelp2Exit()
 {
     if(!this->m_timerExit->isActive())
     {

@@ -61,7 +61,12 @@ SOURCES += main.cpp \
     webrtc/splitting_filter.c \
     webrtc/vector_scaling_operations.c \
     json/zjsonthread.cpp \
-    forward/ztcp2uartthread.cpp
+    forward/ztcp2uartthread.cpp \
+    imgproc/zimgprocthread.cpp \
+    imgproc/zrtspthread.cpp \
+    ui/zimgdispui.cpp \
+    ui/zmainui.cpp \
+    imgproc/zvideotask.cpp
     #libns.c
 
 
@@ -92,7 +97,19 @@ HEADERS += \
     zaudiotxthread.h \
     znoisecutthread.h \
     json/zjsonthread.h \
-    forward/ztcp2uartthread.h
+    forward/ztcp2uartthread.h \
+    imgproc/zimgprocthread.h \
+    imgproc/zrtspthread.h \
+    ui/zimgdispui.h \
+    ui/zmainui.h \
+    imgproc/zvideotask.h
 
+INCLUDEPATH += /usr/include/gstreamer-1.0
+INCLUDEPATH += /usr/include/glib-2.0
+INCLUDEPATH += /usr/lib/aarch64-linux-gnu/glib-2.0/include
+
+
+LIBS += -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0 -pthread
+LIBS += -lopencv_dnn -lopencv_ml -lopencv_objdetect -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_videostab -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_video -lopencv_photo -lopencv_imgproc -lopencv_flann -lopencv_core
 LIBS += -lasound -lopus
 LIBS += -L$$PWD/../libns -lwebrtc -lrnnoise -lns

@@ -14,12 +14,10 @@ public:
      ZAudioTask(QObject *parent = 0);
     ~ZAudioTask();
      qint32 ZStartTask();
-
-     ZNoiseCutThread* ZGetNoiseCutThread();
      bool ZIsExitCleanup();
 
 private slots:
-    void ZSlotHelpThreads2Exit();
+    void ZSlotHelp2Exit();
     void ZSlotTimeout();
 private:
     //Audio Capture --noise queue-->  Noise Cut --play queue--> Local Play.

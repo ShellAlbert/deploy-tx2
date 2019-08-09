@@ -21,6 +21,8 @@ public:
     qint32 ZBindQueue(QMutex *mutex,///<
                      QWaitCondition *condNotEmpty,QWaitCondition *condNotFull,///<
                      QQueue<cv::Mat*> *queueFree,QQueue<cv::Mat*> *queueUsed);
+
+    bool ZIsCleanup();
 protected:
     void run();
 signals:
@@ -28,6 +30,8 @@ signals:
     void ZSigConnectionLost();
     void ZSigNewImg(const QImage &img);
 
+private:
+    bool m_bCleanup;
 private:
     QString m_rtspAddr;
 

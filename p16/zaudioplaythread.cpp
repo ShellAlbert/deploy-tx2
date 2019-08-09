@@ -163,7 +163,7 @@ void ZAudioPlayThread::run()
         gGblPara.m_bGblRst2Exit=true;
         return;
     }
-    if(request_periods!=periods)
+    if((int)request_periods!=periods)
     {
         qDebug("<Warning>:Audio PlayThread,requested %d periods,but recieved %d.\n", request_periods, periods);
     }

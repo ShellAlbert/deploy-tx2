@@ -20,6 +20,8 @@
 #include "zaudiotask.h"
 #include "forward/ztcp2uartthread.h"
 #include "json/zjsonthread.h"
+#include "ui/zmainui.h"
+#include "imgproc/zvideotask.h"
 #include "zgblpara.h"
 void gSIGHandler(int sigNo)
 {
@@ -43,8 +45,8 @@ int main(int argc, char *argv[])
     QApplication p16(argc, argv);
 
     //1.audio thread: capture -> noise suppression -> tx & play.
-    ZAudioTask *task=new ZAudioTask;
-    if(task->ZStartTask()<0)
+    ZAudioTask *audio=new ZAudioTask;
+    if(audio->ZStartTask()<0)
     {
         qDebug()<<"<error>:failed to start audio task!";
         return -1;
@@ -66,12 +68,29 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    //4.ui.
+    ZMainUI *ui=new ZMainUI;
+    if(ui->ZDoInit()<0)
+    {
+        qDebug()<<"<error>:failed to initial main window.";
+        return -1;
+    }
+    ui->showMaximized();
+
+    //5.video task.
+    ZVideoTask *video=new ZVideoTask;
+    if(video->ZStartTask(ui)<0)
+    {
+        qDebug()<<"<error>:failed to start video task.";
+        return -1;
+    }
+
     //install signal handler.
     //Set the signal callback for Ctrl-C
     signal(SIGINT,gSIGHandler);
 
     //write pid to file.
-    QFile filePID("/tmp/ZAudioServer.pid");
+    QFile filePID("/tmp/p16.pid");
     if(!filePID.open(QIODevice::WriteOnly))
     {
         qDebug()<<"<error>:error to write pid file."<<filePID.errorString();
@@ -82,25 +101,35 @@ int main(int argc, char *argv[])
     sprintf(pidBuffer,"%d",getpid());
     filePID.write(pidBuffer,strlen(pidBuffer));
     filePID.close();
-    qDebug()<<"write pid to /tmp/ZAudioServer.pid,"<<pidBuffer<<".";
-
+    qDebug()<<"write pid to /tmp/p16.pid,"<<pidBuffer<<".";
 
     //enter event loop until exit() was called.
     ret=p16.exec();
 
-    while(!task->ZIsExitCleanup())
+    while(!audio->ZIsExitCleanup())
     {
-        qDebug()<<"<exit>:waiting for threads...";
+        qDebug()<<"<exit>:waiting for audio threads...";
     }
 
-    delete task;
-    task=NULL;
+    while(!video->ZIsCleanup())
+    {
+        qDebug()<<"<exit>:waiting for video threads...";
+    }
+
+    delete audio;
+    audio=NULL;
+
+    delete video;
+    video=NULL;
 
     delete tcp2uart;
     tcp2uart=NULL;
 
     delete json;
     json=NULL;
+
+    delete ui;
+    ui=NULL;
 
     qDebug()<<"<exit>:done.";
     return ret;

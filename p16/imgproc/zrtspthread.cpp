@@ -15,6 +15,7 @@ qint32 ZRtspThread::ZBindQueue(QMutex *mutex,///<
     this->m_condNotFull=condNotFull;
     this->m_queueFree=queueFree;
     this->m_queueUsed=queueUsed;
+    this->m_bCleanup=false;
     return 0;
 }
 void ZRtspThread::run()
@@ -25,7 +26,7 @@ void ZRtspThread::run()
     //std::string gstreamer_pipe="rtspsrc location=\"rtsp://192.168.137.10:554/user=admin&password=&channel=1&stream=0.sdp\" ! rtph264depay ! h264parse ! omxh264dec ! nvvidconv ! video/x-raw,width=1920,height=1080,format=BGRx ! videoconvert ! appsink";
     //std::string gstreamer_pipe="rtspsrc location=\"rtsp://192.168.1.89:554/user=admin&password=&channel=1&stream=0.sdp\" ! rtph264depay ! h264parse ! omxh264dec ! nvvidconv ! video/x-raw,width=1920,height=1080,format=BGRx ! videoconvert ! appsink";
 
-    while(!gGblPara.m_bGblRst2ExitFlag)
+    while(!gGblPara.m_bGblRst2Exit)
     {
         //1.open rtsp connection.
         cv::VideoCapture cap(rtspAddr.toStdString(),cv::CAP_GSTREAMER);
@@ -43,7 +44,7 @@ void ZRtspThread::run()
 
         //2.loop to read image.
         cv::Mat mat;
-        while(!gGblPara.m_bGblRst2ExitFlag)
+        while(!gGblPara.m_bGblRst2Exit)
         {
             if(!cap.read(mat))
             {
@@ -64,5 +65,10 @@ void ZRtspThread::run()
         }
         cap.release();
     }
+    this->m_bCleanup=true;
     return;
+}
+bool ZRtspThread::ZIsCleanup()
+{
+    return this->m_bCleanup;
 }

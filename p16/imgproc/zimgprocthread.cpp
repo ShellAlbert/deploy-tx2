@@ -31,7 +31,7 @@ qint32 ZImgProcThread::ZBindQueue2(QMutex *mutex,///<
 
 void ZImgProcThread::run()
 {
-    while(!gGblPara.m_bGblRst2ExitFlag)
+    while(!gGblPara.m_bGblRst2Exit)
     {
         cv::Mat mat1,mat2;
         bool bProcNextTime=false;

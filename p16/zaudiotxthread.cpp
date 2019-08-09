@@ -196,7 +196,6 @@ void ZAudioTxThread::run()
       *          negative error code (see @ref opus_errorcodes) on failure.
       */
     //hold the pcm data.
-    char *pPCMBuffer=new char[PERIOD_SIZE];
     qint32 nPCMLen=0;
 
     char *txBuffer=new char[PERIOD_SIZE];
