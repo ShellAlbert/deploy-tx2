@@ -44,10 +44,10 @@ int main(int argc, char *argv[])
 {
     int ret;
     QApplication p16(argc, argv);
-    ZRtspAudioCapture *cap=new ZRtspAudioCapture;
-    cap->start();
-    return p16.exec();
-#if 0
+//    ZRtspAudioCapture *cap=new ZRtspAudioCapture;
+//    cap->start();
+//    return p16.exec();
+#if 1
 
     //1.audio thread: capture -> noise suppression -> tx & play.
     ZAudioTask *audio=new ZAudioTask;
