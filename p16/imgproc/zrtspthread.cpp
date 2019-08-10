@@ -5,6 +5,7 @@
 ZRtspThread::ZRtspThread(QString rtspAddr)
 {
     this->m_rtspAddr=rtspAddr;
+    this->m_bCleanup=false;
 }
 qint32 ZRtspThread::ZBindQueue(QMutex *mutex,///<
                  QWaitCondition *condNotEmpty,QWaitCondition *condNotFull,///<
@@ -15,7 +16,7 @@ qint32 ZRtspThread::ZBindQueue(QMutex *mutex,///<
     this->m_condNotFull=condNotFull;
     this->m_queueFree=queueFree;
     this->m_queueUsed=queueUsed;
-    this->m_bCleanup=false;
+
     return 0;
 }
 void ZRtspThread::run()
@@ -61,11 +62,78 @@ void ZRtspThread::run()
                 break;
             }
             //qDebug()<<this->m_rtspAddr<<"read img okay"<<mat.cols<<mat.rows<<mat.depth()<<mat.channels();
+            //black-white:gray: so channels()=1.
+            //RGB: channels()=3.
+            qDebug()<<mat.cols<<mat.rows<<","<<mat.channels();
 
+#if 0
+            //get a free buffer from fifo.
+            this->m_mutex->lock();
+            while(this->m_freeQueue->isEmpty())
+            {//timeout 5s to check exit flag.
+                if(!this->m_condQueueEmpty->wait(this->m_mutex,5000))
+                {
+                    this->m_mutex->unlock();
+                    if(gGblPara.m_bGblRst2Exit)
+                    {
+                        break;
+                    }
+                }
+            }
+            if(gGblPara.m_bGblRst2Exit)
+            {
+                break;
+            }
+
+            QByteArray *pcmBuffer=this->m_freeQueue->dequeue();
+            this->m_mutex->unlock();
+
+            // Read capture buffer from ALSA input device.
+            while(1)
+            {
+                qint32 nRet=snd_pcm_readi(pcmHandle,pcmBuffer->data(),PERIOD_SIZE>>2);
+                if(nRet<0)
+                {
+                    snd_pcm_prepare(pcmHandle);
+                    qDebug()<<QDateTime::currentDateTime()<<",<CAP>:Buffer Overrun";
+                    gGblPara.m_audio.m_nCapOverrun++;
+                    continue;
+                }else{
+                    break;
+                }
+            }
+            this->m_mutex->lock();
+            this->m_usedQueue->enqueue(pcmBuffer);
+            this->m_condQueueFull->wakeAll();
+            this->m_mutex->unlock();
+        }
+#endif
             //4.add image to fifo.
             //4.1 fetch a free buffer in freeQueue.
-            //4.2 read data to free buffer.
-            //4.3 notify other threads.
+            this->m_mutex->lock();
+            while(this->m_queueFree->isEmpty())
+            {
+                if(!this->m_condNotFull->wait(this->m_mutex,5000))
+                {
+                    this->m_mutex->unlock();
+                    if(gGblPara.m_bGblRst2Exit)
+                    {
+                        break;
+                    }
+                }
+            }
+            if(gGblPara.m_bGblRst2Exit)
+            {
+                break;
+            }
+            cv::Mat *matDest=this->m_queueFree->dequeue();
+            memcpy(matDest->data,mat.data,mat.cols*mat.rows*mat.channels());
+            this->m_queueUsed->enqueue(matDest);
+            this->m_condNotEmpty->wakeAll();
+            this->m_mutex->unlock();
+            qDebug()<<this->m_rtspAddr<<":"<<"push one frame";
+
+            //convert cv::Mat to QImage.
             QImage img=cvMat2QImage(mat);
             emit this->ZSigNewImg(img);
         }

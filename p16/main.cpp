@@ -49,6 +49,14 @@ int main(int argc, char *argv[])
 //    return p16.exec();
 #if 1
 
+    //read config file.
+    QFile fileCfg("p16.ini");
+    if(!fileCfg.exists())
+    {
+        gGblPara.initCfgFile();
+    }
+    gGblPara.readCfgFile();
+
     //1.audio thread: capture -> noise suppression -> tx & play.
     ZAudioTask *audio=new ZAudioTask;
     if(audio->ZStartTask()<0)

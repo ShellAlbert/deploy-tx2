@@ -157,7 +157,7 @@ public:
 
     void readCfgFile();
     void writeCfgFile();
-    void resetCfgFile();
+    void initCfgFile();
 public:
     //(x1,y1) calibrate center of camera1.
     qint32 m_calCenterX1;
@@ -170,18 +170,9 @@ public:
     qint32 m_calCenterX3;
     qint32 m_calCenterY3;
 
-    //cut template size.
-    qint32 m_nCutTemplateWidth;
-    qint32 m_nCutTemplateHeight;
-public:
-    bool m_bDebugMode;
-    bool m_bDumpCamInfo2File;
-    bool m_bCaptureLog;
-    bool m_bTransfer2PC;
-    bool m_bTransferSpeedMonitor;
-    bool m_bDumpUART;
-    bool m_bXMode;
-    bool m_bFMode;
+    //cut box size.
+    qint32 m_nCutBoxWidth;
+    qint32 m_nCutBoxHeight;
 public:
     //the global request to exit flag.
     //it will cause every thread occurs errors.
@@ -192,9 +183,7 @@ public:
     qint64 m_nAccumulatedSec;
 
 public:
-    //Android(tcp) <--> STM32(uart) 串口透传线程相关.
-    //Tcp2Uart thread related flags.
-    bool m_bTcp2UartThreadExitFlag;
+    //Android(tcp) <--> STM32(uart).
     bool m_bTcp2UartConnected;
     qint64 m_nTcp2UartBytes;
     qint64 m_nUart2TcpBytes;

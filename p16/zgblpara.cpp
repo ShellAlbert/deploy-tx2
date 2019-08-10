@@ -25,7 +25,7 @@ ZAudioParam::ZAudioParam()
     //playback thread buffer underrun.
     this->m_nPlayUnderrun=0;
 
-    //同一时刻我们仅允许一个audio tcp客户端连接.
+    //only one audio tcp client connect allowed.
     this->m_bAudioTcpConnected=false;
 
     //for noise view.
@@ -52,16 +52,6 @@ ZAudioParam::ZAudioParam()
 }
 ZGblPara::ZGblPara()
 {
-    this->m_bDebugMode=false;
-    this->m_bDumpCamInfo2File=false;
-    this->m_bCaptureLog=false;
-    this->m_bTransfer2PC=false;
-    this->m_bTransferSpeedMonitor=false;
-    this->m_bDumpUART=false;
-    //default xMode is on.fMode is off.
-    this->m_bXMode=true;
-    this->m_bFMode=false;
-
     this->m_bGblRst2Exit=false;
     this->m_nAccumulatedSec=0;
 
@@ -97,9 +87,9 @@ void ZGblPara::readCfgFile()
     gGblPara.m_calCenterY3=iniFile.value("y3",0).toInt();
     iniFile.endGroup();
 
-    iniFile.beginGroup("CuteTemplate");
-    gGblPara.m_nCutTemplateWidth=iniFile.value("width",0).toInt();
-    gGblPara.m_nCutTemplateHeight=iniFile.value("height",0).toInt();
+    iniFile.beginGroup("CuteBox");
+    gGblPara.m_nCutBoxWidth=iniFile.value("width",0).toInt();
+    gGblPara.m_nCutBoxHeight=iniFile.value("height",0).toInt();
     iniFile.endGroup();
 }
 void ZGblPara::writeCfgFile()
@@ -121,13 +111,13 @@ void ZGblPara::writeCfgFile()
     iniFile.setValue("y3",gGblPara.m_calCenterY3);
     iniFile.endGroup();
 
-    iniFile.beginGroup("CuteTemplate");
-    iniFile.setValue("width",gGblPara.m_nCutTemplateWidth);
-    iniFile.setValue("height",gGblPara.m_nCutTemplateHeight);
+    iniFile.beginGroup("CuteBox");
+    iniFile.setValue("width",gGblPara.m_nCutBoxWidth);
+    iniFile.setValue("height",gGblPara.m_nCutBoxHeight);
     iniFile.endGroup();
 
 }
-void ZGblPara::resetCfgFile()
+void ZGblPara::initCfgFile()
 {
     gGblPara.m_calCenterX1=0;
     gGblPara.m_calCenterY1=0;
@@ -135,8 +125,11 @@ void ZGblPara::resetCfgFile()
     gGblPara.m_calCenterX2=0;
     gGblPara.m_calCenterY2=0;
 
-    gGblPara.m_nCutTemplateWidth=200;
-    gGblPara.m_nCutTemplateHeight=200;
+    gGblPara.m_calCenterX3=0;
+    gGblPara.m_calCenterY3=0;
+
+    gGblPara.m_nCutBoxWidth=200;
+    gGblPara.m_nCutBoxHeight=200;
 
     this->writeCfgFile();
 }
