@@ -13,11 +13,14 @@ public:
     ZImgProcThread();
 
     qint32 ZBindQueue1(QMutex *mutex,///<
-                     QWaitCondition *condNotEmpty,QWaitCondition *condNotFull,///<
-                     QQueue<cv::Mat*> *queueFree,QQueue<cv::Mat*> *queueUsed);
+                       QWaitCondition *condNotEmpty,QWaitCondition *condNotFull,///<
+                       QQueue<cv::Mat*> *queueFree,QQueue<cv::Mat*> *queueUsed);
     qint32 ZBindQueue2(QMutex *mutex,///<
-                     QWaitCondition *condNotEmpty,QWaitCondition *condNotFull,///<
-                     QQueue<cv::Mat*> *queueFree,QQueue<cv::Mat*> *queueUsed);
+                       QWaitCondition *condNotEmpty,QWaitCondition *condNotFull,///<
+                       QQueue<cv::Mat*> *queueFree,QQueue<cv::Mat*> *queueUsed);
+signals:
+    void ZSigNewImg1(const QImage &img);
+    void ZSigNewImg2(const QImage &img);
 protected:
     void run();
 private:

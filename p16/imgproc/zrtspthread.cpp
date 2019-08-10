@@ -66,48 +66,6 @@ void ZRtspThread::run()
             //RGB: channels()=3.
             qDebug()<<mat.cols<<mat.rows<<","<<mat.channels();
 
-#if 0
-            //get a free buffer from fifo.
-            this->m_mutex->lock();
-            while(this->m_freeQueue->isEmpty())
-            {//timeout 5s to check exit flag.
-                if(!this->m_condQueueEmpty->wait(this->m_mutex,5000))
-                {
-                    this->m_mutex->unlock();
-                    if(gGblPara.m_bGblRst2Exit)
-                    {
-                        break;
-                    }
-                }
-            }
-            if(gGblPara.m_bGblRst2Exit)
-            {
-                break;
-            }
-
-            QByteArray *pcmBuffer=this->m_freeQueue->dequeue();
-            this->m_mutex->unlock();
-
-            // Read capture buffer from ALSA input device.
-            while(1)
-            {
-                qint32 nRet=snd_pcm_readi(pcmHandle,pcmBuffer->data(),PERIOD_SIZE>>2);
-                if(nRet<0)
-                {
-                    snd_pcm_prepare(pcmHandle);
-                    qDebug()<<QDateTime::currentDateTime()<<",<CAP>:Buffer Overrun";
-                    gGblPara.m_audio.m_nCapOverrun++;
-                    continue;
-                }else{
-                    break;
-                }
-            }
-            this->m_mutex->lock();
-            this->m_usedQueue->enqueue(pcmBuffer);
-            this->m_condQueueFull->wakeAll();
-            this->m_mutex->unlock();
-        }
-#endif
             //4.add image to fifo.
             //4.1 fetch a free buffer in freeQueue.
             this->m_mutex->lock();
@@ -131,11 +89,11 @@ void ZRtspThread::run()
             this->m_queueUsed->enqueue(matDest);
             this->m_condNotEmpty->wakeAll();
             this->m_mutex->unlock();
-            qDebug()<<this->m_rtspAddr<<":"<<"push one frame";
+            //qDebug()<<this->m_rtspAddr<<":"<<"push one frame";
 
             //convert cv::Mat to QImage.
-            QImage img=cvMat2QImage(mat);
-            emit this->ZSigNewImg(img);
+            //QImage img=cvMat2QImage(mat);
+            //emit this->ZSigNewImg(img);
         }
         cap.release();
     }

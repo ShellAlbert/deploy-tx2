@@ -52,8 +52,10 @@ qint32 ZVideoTask::ZStartTask(QWidget *mainUI)
     this->m_imgProc->ZBindQueue2(&this->m_rtsp2imgProcMux2,///<
                                  &this->m_condRtsp2imgProcNotEmpty2,&this->m_condRtsp2imgProcNotFull2,///<
                                  &this->m_rtsp2imgProcFree2,&this->m_rtsp2imgProcUsed2);
-    QObject::connect(this->m_rtsp1,SIGNAL(ZSigNewImg(QImage)),mainUI2->ZGetDispUI(0),SLOT(ZSlotFlushImg(QImage)));
-    QObject::connect(this->m_rtsp2,SIGNAL(ZSigNewImg(QImage)),mainUI2->ZGetDispUI(1),SLOT(ZSlotFlushImg(QImage)));
+    //QObject::connect(this->m_rtsp1,SIGNAL(ZSigNewImg(QImage)),mainUI2->ZGetDispUI(0),SLOT(ZSlotFlushImg(QImage)));
+    //QObject::connect(this->m_rtsp2,SIGNAL(ZSigNewImg(QImage)),mainUI2->ZGetDispUI(1),SLOT(ZSlotFlushImg(QImage)));
+    QObject::connect(this->m_imgProc,SIGNAL(ZSigNewImg1(QImage)),mainUI2->ZGetDispUI(0),SLOT(ZSlotFlushImg(QImage)));
+    QObject::connect(this->m_imgProc,SIGNAL(ZSigNewImg2(QImage)),mainUI2->ZGetDispUI(1),SLOT(ZSlotFlushImg(QImage)));
 
     this->m_rtsp1->start();
     this->m_rtsp2->start();
