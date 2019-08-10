@@ -22,6 +22,7 @@
 #include "json/zjsonthread.h"
 #include "ui/zmainui.h"
 #include "imgproc/zvideotask.h"
+#include "zrtspaudiocapture.h"
 #include "zgblpara.h"
 void gSIGHandler(int sigNo)
 {
@@ -43,6 +44,10 @@ int main(int argc, char *argv[])
 {
     int ret;
     QApplication p16(argc, argv);
+    ZRtspAudioCapture *cap=new ZRtspAudioCapture;
+    cap->start();
+    return p16.exec();
+#if 0
 
     //1.audio thread: capture -> noise suppression -> tx & play.
     ZAudioTask *audio=new ZAudioTask;
@@ -133,4 +138,5 @@ int main(int argc, char *argv[])
 
     qDebug()<<"<exit>:done.";
     return ret;
+#endif
 }

@@ -66,7 +66,8 @@ SOURCES += main.cpp \
     imgproc/zrtspthread.cpp \
     ui/zimgdispui.cpp \
     ui/zmainui.cpp \
-    imgproc/zvideotask.cpp
+    imgproc/zvideotask.cpp \
+    zrtspaudiocapture.cpp
     #libns.c
 
 
@@ -102,14 +103,21 @@ HEADERS += \
     imgproc/zrtspthread.h \
     ui/zimgdispui.h \
     ui/zmainui.h \
-    imgproc/zvideotask.h
+    imgproc/zvideotask.h \
+    zrtspaudiocapture.h
 
 INCLUDEPATH += /usr/include/gstreamer-1.0
 INCLUDEPATH += /usr/include/glib-2.0
 INCLUDEPATH += /usr/lib/aarch64-linux-gnu/glib-2.0/include
-
+#Qt5QGstreamer
+INCLUDEPATH += /usr/include/Qt5GStreamer
+INCLUDEPATH += /usr/include/orc-0.4
+INCLUDEPATH += /usr/include/aarch64-linux-gnu/qt5/QtCore
+INCLUDEPATH += /usr/include/aarch64-linux-gnu/qt5
 
 LIBS += -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0 -pthread
 LIBS += -lopencv_dnn -lopencv_ml -lopencv_objdetect -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_videostab -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_video -lopencv_photo -lopencv_imgproc -lopencv_flann -lopencv_core
 LIBS += -lasound -lopus
 LIBS += -L$$PWD/../libns -lwebrtc -lrnnoise -lns
+
+LIBS += -lQt5GStreamerUtils-1.0 -lQt5GStreamer-1.0 -lQt5GLib-2.0 -lQt5Core
