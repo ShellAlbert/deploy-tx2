@@ -23,11 +23,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp \
     zgblpara.cpp \
-    zaudiocapturethread.cpp \
-    zaudioplaythread.cpp \
-    zaudiotask.cpp \
-    zaudiotxthread.cpp \
-    znoisecutthread.cpp \
+    alsa/zaudiocapturethread.cpp \
+    alsa/zaudioplaythread.cpp \
+    alsa/zaudiotask.cpp \
+    alsa/zaudiotxthread.cpp \
+    alsa/znoisecutthread.cpp \
     webrtc/analog_agc.c \
     webrtc/complex_bit_reverse.c \
     webrtc/complex_fft.c \
@@ -67,7 +67,7 @@ SOURCES += main.cpp \
     ui/zimgdispui.cpp \
     ui/zmainui.cpp \
     imgproc/zvideotask.cpp \
-    zrtspaudiocapture.cpp
+    rtsp/zrtspaudiocapture.cpp
     #libns.c
 
 
@@ -92,11 +92,11 @@ HEADERS += \
     webrtc/typedefs.h \
     webrtc/windows_private.h \
     zgblpara.h \
-    zaudiocapturethread.h \
-    zaudioplaythread.h \
-    zaudiotask.h \
-    zaudiotxthread.h \
-    znoisecutthread.h \
+    alsa/zaudiocapturethread.h \
+    alsa/zaudioplaythread.h \
+    alsa/zaudiotask.h \
+    alsa/zaudiotxthread.h \
+    alsa/znoisecutthread.h \
     json/zjsonthread.h \
     forward/ztcp2uartthread.h \
     imgproc/zimgprocthread.h \
@@ -104,7 +104,7 @@ HEADERS += \
     ui/zimgdispui.h \
     ui/zmainui.h \
     imgproc/zvideotask.h \
-    zrtspaudiocapture.h
+    rtsp/zrtspaudiocapture.h
 
 INCLUDEPATH += /usr/include/gstreamer-1.0
 INCLUDEPATH += /usr/include/glib-2.0

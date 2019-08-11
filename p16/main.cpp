@@ -17,12 +17,12 @@
 #include <errno.h>
 #include <unistd.h>
 
-#include "zaudiotask.h"
+#include "alsa/zaudiotask.h"
 #include "forward/ztcp2uartthread.h"
 #include "json/zjsonthread.h"
 #include "ui/zmainui.h"
 #include "imgproc/zvideotask.h"
-#include "zrtspaudiocapture.h"
+#include "rtsp/zrtspaudiocapture.h"
 #include "zgblpara.h"
 void gSIGHandler(int sigNo)
 {

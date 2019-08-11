@@ -1,10 +1,10 @@
 #ifndef ZAUDIOTASK_H
 #define ZAUDIOTASK_H
 #include "zgblpara.h"
-#include <zaudiocapturethread.h>
-#include <znoisecutthread.h>
-#include <zaudioplaythread.h>
-#include <zaudiotxthread.h>
+#include "zaudiocapturethread.h"
+#include "znoisecutthread.h"
+#include "zaudioplaythread.h"
+#include "zaudiotxthread.h"
 #include <QTimer>
 
 class ZAudioTask : public QObject
