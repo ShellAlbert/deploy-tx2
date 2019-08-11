@@ -14,7 +14,7 @@ public:
      ZAudioTask(QObject *parent = 0);
     ~ZAudioTask();
      qint32 ZStartTask();
-     bool ZIsExitCleanup();
+     bool ZIsCleanup();
 
 private slots:
     void ZSlotHelp2Exit();

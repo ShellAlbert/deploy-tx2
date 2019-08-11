@@ -5,6 +5,8 @@
 #it monitor all program pid files,launch execute files once detected failure.
 #1811543668@qq.com  August 11,2019.
 
+BASEDIR=/home/zhangshaoyan/p16
+
 #$@ all parameters,$0 app name,$1 parameter1,$2 parameter2,...
 function addLog2File()
 {
@@ -47,10 +49,12 @@ function addLog2File()
 }
 
 #make sure we run this with root priority.
-if [ `whoami` != "root" ];then
-	echo "<error>: latch me with root priority please."
-	exit -1
-fi
+#if [ `whoami` != "root" ];then
+#	echo "<error>: latch me with root priority please."
+#	exit -1
+#fi
+
+cd $BASEDIR
 
 #create log directory.
 if [ ! -d "log" ];then
@@ -60,8 +64,12 @@ fi
 #elevate privilege.
 if [ -e "/dev/ttyTHS2" ];then
 	addLog2File "elevate privilege /dev/ttyTHS2."
-	chmod 777 /dev/ttyTHS2
+	#chmod 777 /dev/ttyTHS2
 fi
+
+#dump myself pid to file.
+echo $$ > /tmp/monitor.pid
+
 
 #the main loop.
 while true

@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
         qDebug()<<"<error>:failed to initial main window.";
         return -1;
     }
-    ui->showMaximized();
+
 
     //5.video task.
     ZVideoTask *video=new ZVideoTask;
@@ -98,6 +98,10 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+
+    //6.manage threads.
+    ui->ZManageThreads(audio,tcp2uart,json,video);
+    ui->showMaximized();
     //install signal handler.
     //Set the signal callback for Ctrl-C
     signal(SIGINT,gSIGHandler);
@@ -119,16 +123,7 @@ int main(int argc, char *argv[])
     //enter event loop until exit() was called.
     ret=p16.exec();
 
-    while(!audio->ZIsExitCleanup())
-    {
-        qDebug()<<"<exit>:waiting for audio threads...";
-    }
-
-    while(!video->ZIsCleanup())
-    {
-        qDebug()<<"<exit>:waiting for video threads...";
-    }
-
+    //free resources.
     delete audio;
     audio=NULL;
 

@@ -13,8 +13,7 @@ class ZJsonThread:public QThread
 public:
     ZJsonThread(QObject *parent=nullptr);
     qint32 ZStartThread();
-signals:
-    void ZSigThreadExited();
+    bool ZIsCleanup();
 protected:
     void run();
 private:
@@ -25,5 +24,6 @@ private:
 private:
     qint64 m_nJsonLen;
     qint8 *m_recvBuffer;
+    bool m_bCleanup;
 };
 #endif // ZCTLTHREAD_H

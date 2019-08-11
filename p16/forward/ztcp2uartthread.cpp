@@ -152,11 +152,10 @@ void ZTcp2UartForwardThread::run()
     qDebug()<<"<MainLoop>:Tcp2UartThread ends.";
     //set global request exit flag to notify other threads.
     gGblPara.m_bGblRst2Exit=true;
-    emit this->ZSigThreadFinished();
     this->m_bCleanup=true;
     return;
 }
-bool ZTcp2UartForwardThread::ZIsExitCleanup()
+bool ZTcp2UartForwardThread::ZIsCleanup()
 {
     return this->m_bCleanup;
 }

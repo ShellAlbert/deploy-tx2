@@ -12,9 +12,7 @@ public:
     qint32 ZStartThread();
     qint32 ZStopThread();
 
-    bool ZIsExitCleanup();
-signals:
-    void ZSigThreadFinished();
+    bool ZIsCleanup();
 protected:
     void run();
 private:

@@ -1,6 +1,5 @@
 #include "zaudiotask.h"
 #include "zgblpara.h"
-#include <QCoreApplication>
 ZAudioTask::ZAudioTask(QObject *parent):QObject(parent)
 {
     //exit timer check.
@@ -191,15 +190,14 @@ void ZAudioTask::ZSlotTimeout()
         }
 
         //当所有的子线程都退出时，则音频任务退出。
-        if(this->ZIsExitCleanup())
+        if(this->ZIsCleanup())
         {
             this->m_timerExit->stop();
-            qApp->exit(0);
         }
     }
 #endif
 }
-bool ZAudioTask::ZIsExitCleanup()
+bool ZAudioTask::ZIsCleanup()
 {
     bool bAllCleanup=true;
     if(!this->m_capThread->ZIsExitCleanup())

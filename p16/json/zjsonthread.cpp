@@ -14,11 +14,16 @@ ZJsonThread::ZJsonThread(QObject *parent):QThread(parent)
 {
     this->m_tcpSocket=NULL;
     this->m_nJsonLen=0;
+    this->m_bCleanup=false;
 }
 qint32 ZJsonThread::ZStartThread()
 {
     this->start();
     return 0;
+}
+bool ZJsonThread::ZIsCleanup()
+{
+    return this->m_bCleanup;
 }
 void ZJsonThread::run()
 {
@@ -52,7 +57,10 @@ void ZJsonThread::run()
             }
         }
 
-
+        if(gGblPara.m_bGblRst2Exit)
+        {
+            break;
+        }
         this->m_tcpSocket=tcpServer->nextPendingConnection();
         if(NULL==this->m_tcpSocket)
         {
@@ -131,7 +139,11 @@ void ZJsonThread::run()
     delete tcpServer;
     tcpServer=NULL;
 
-    emit this->ZSigThreadExited();
+    qDebug()<<"<MainLoop>:JsonThread ends.";
+    //set global request exit flag to notify other threads.
+    gGblPara.m_bGblRst2Exit=true;
+    this->m_bCleanup=true;
+    return;
 }
 
 qint32 ZJsonThread::ZScanRecvBuffer()
