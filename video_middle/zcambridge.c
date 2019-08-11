@@ -1,6 +1,6 @@
 /**
   * usb camera(yuv) -> h264enc -> rtsp server.
-  * gcc zcamusbrtspserver.c -o zcamusbrtspserver.bin $(pkg-config --cflags --libs gstreamer-1.0 gstreamer-rtsp-server-1.0)
+  * gcc zcambridge.c -o zcambridge.bin $(pkg-config --cflags --libs gstreamer-1.0 gstreamer-rtsp-server-1.0)
   * tcp ports list
   * 6803: left view camera.(ethernet)
   * 6805: right view camera.(ethernet)
@@ -36,18 +36,24 @@ int main(int argc,char *argv[])
   int fd;
   char buffer[64];
 
+  //check /dev/videox is exist or not.
+  if(access("/dev/video1",F_OK)<0)
+  {
+	  printf("<error>: yuv camera /dev/video1 not exists!\n");
+	  return -1;
+  }
   //create pid file.
-  fd=open("/tmp/ZCamUsbRtspServer.pid",O_CREAT|O_TRUNC|O_WRONLY,0644);
+  fd=open("/tmp/zcambridge.pid",O_CREAT|O_TRUNC|O_WRONLY,0644);
   if(fd<0)
   {
-      printf("<error>:failed to create /tmp/ZCamUsbRtspServer.pid file.");
+      printf("<error>:failed to create /tmp/zcambridge.pid file.");
       return -1;
   }
   memset(buffer,0,sizeof(buffer));
   sprintf(buffer,"%d",getpid());
   if(write(fd,buffer,strlen(buffer))<0)
   {
-      printf("<error>:failed to write /tmp/ZCamUsbRtspServer.pid file.");
+      printf("<error>:failed to write /tmp/zcambridge.pid file.");
       return -1;
   }
   close(fd);
