@@ -115,8 +115,9 @@ INCLUDEPATH += /usr/include/orc-0.4
 INCLUDEPATH += /usr/include/aarch64-linux-gnu/qt5/QtCore
 INCLUDEPATH += /usr/include/aarch64-linux-gnu/qt5
 
+#-lopencv_dnn
 LIBS += -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0 -pthread
-LIBS += -lopencv_dnn -lopencv_ml -lopencv_objdetect -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_videostab -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_video -lopencv_photo -lopencv_imgproc -lopencv_flann -lopencv_core
+LIBS += -lopencv_ml -lopencv_objdetect -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_videostab -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_video -lopencv_photo -lopencv_imgproc -lopencv_flann -lopencv_core
 LIBS += -lasound -lopus
 LIBS += -L$$PWD/../libns -lwebrtc -lrnnoise -lns
 

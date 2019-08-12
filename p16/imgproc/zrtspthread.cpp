@@ -19,6 +19,9 @@ qint32 ZRtspThread::ZBindQueue(QMutex *mutex,///<
 
     return 0;
 }
+
+//XiongMai IP Camera must be set to Black/White mode before running this thread.
+//1920*1080*25fps,gray.
 void ZRtspThread::run()
 {
     //CAUTION HERE!!!
@@ -64,7 +67,7 @@ void ZRtspThread::run()
             //qDebug()<<this->m_rtspAddr<<"read img okay"<<mat.cols<<mat.rows<<mat.depth()<<mat.channels();
             //black-white:gray: so channels()=1.
             //RGB: channels()=3.
-            qDebug()<<mat.cols<<mat.rows<<","<<mat.channels();
+            //qDebug()<<mat.cols<<mat.rows<<","<<mat.channels();
 
             //4.add image to fifo.
             //4.1 fetch a free buffer in freeQueue.
