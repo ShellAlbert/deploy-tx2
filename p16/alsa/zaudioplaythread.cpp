@@ -241,7 +241,7 @@ void ZAudioPlayThread::run()
             if(ret==-EPIPE)
             {
                 snd_pcm_prepare(this->m_pcmHandle);
-                qDebug()<<QDateTime::currentDateTime()<<",<Playback>:Buffer Underrun\n";
+                qDebug()<<"<ALSA Playback>:Buffer Underrun\n";
                 continue;
             }else{
                 break;

@@ -16,7 +16,10 @@
 #include <fcntl.h>
 
 #define DEFAULT_RTSP_PORT "6807"
-#define PIPE_LINE " ( v4l2src device=/dev/video1 ! video/x-raw,width=(int)640,height=(int)480,framerate=(fraction)30/1 ! queue ! nvvidconv ! omxh264enc ! rtph264pay name=pay0 pt=96 )"
+/**
+ *  #define PIPE_LINE " ( v4l2src device=/dev/video0 ! video/x-raw,width=(int)640,height=(int)480,framerate=(fraction)30/1 ! queue ! nvvidconv ! omxh264enc ! rtph264pay name=pay0 pt=96 )" 
+ * */
+#define PIPE_LINE " ( v4l2src device=/dev/video0 ! video/x-raw,width=(int)640,height=(int)480,framerate=(fraction)30/1 ! queue ! nvvidconv ! omxh264enc ! rtph264pay name=pay0 pt=96 )"
 static char *port=(char*)DEFAULT_RTSP_PORT;
 
 static GOptionEntry entries[] = {
@@ -37,9 +40,9 @@ int main(int argc,char *argv[])
   char buffer[64];
 
   //check /dev/videox is exist or not.
-  if(access("/dev/video1",F_OK)<0)
+  if(access("/dev/video0",F_OK)<0)
   {
-	  printf("<error>: yuv camera /dev/video1 not exists!\n");
+	  printf("<error>: yuv camera /dev/video0 not exists!\n");
 	  return -1;
   }
   //create pid file.

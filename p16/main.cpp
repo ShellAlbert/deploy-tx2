@@ -91,16 +91,15 @@ int main(int argc, char *argv[])
 
 
     //5.video task.
-    ZVideoTask *video=new ZVideoTask;
-    if(video->ZStartTask(ui)<0)
-    {
-        qDebug()<<"<error>:failed to start video task.";
-        return -1;
-    }
-
+//    ZVideoTask *video=new ZVideoTask;
+//    if(video->ZStartTask(ui)<0)
+//    {
+//        qDebug()<<"<error>:failed to start video task.";
+//        return -1;
+//    }
 
     //6.manage threads.
-    ui->ZManageThreads(audio,tcp2uart,json,video);
+    ui->ZManageThreads(audio,tcp2uart,json,NULL/*video*/);
     ui->showMaximized();
     //install signal handler.
     //Set the signal callback for Ctrl-C
@@ -127,8 +126,8 @@ int main(int argc, char *argv[])
     delete audio;
     audio=NULL;
 
-    delete video;
-    video=NULL;
+//    delete video;
+//    video=NULL;
 
     delete tcp2uart;
     tcp2uart=NULL;

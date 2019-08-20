@@ -86,7 +86,7 @@ void ZImgProcThread::run()
         QImage img2=cvMat2QImage(*mat2);
         emit this->ZSigNewImg2(img2);
 
-#if 0
+
         //we cut a (w*h) box image centered on calibrate center(x,y).
         qint32 nCutX=gGblPara.m_calCenterX1-gGblPara.m_nCutBoxWidth/2;
         qint32 nCutY=gGblPara.m_calCenterY1-gGblPara.m_nCutBoxHeight/2;
@@ -98,6 +98,8 @@ void ZImgProcThread::run()
         {
             nCutY=0;
         }
+
+#if 0
         //prepare a little mat.
         cv::Rect rectBox(nCutX,nCutY,gGblPara.m_nCutBoxWidth,gGblPara.m_nCutBoxHeight);
         cv::Mat matTemplate(*mat1,rectBox);

@@ -255,7 +255,7 @@ void ZAudioCaptureThread::run()
             if(nRet<0)
             {
                 snd_pcm_prepare(pcmHandle);
-                qDebug()<<QDateTime::currentDateTime()<<",<CAP>:Buffer Overrun";
+                qDebug()<<"<ALSA Capture>:Buffer Overrun";
                 gGblPara.m_audio.m_nCapOverrun++;
                 continue;
             }else{

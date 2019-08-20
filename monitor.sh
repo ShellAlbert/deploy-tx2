@@ -49,10 +49,10 @@ function addLog2File()
 }
 
 #make sure we run this with root priority.
-#if [ `whoami` != "root" ];then
-#	echo "<error>: latch me with root priority please."
-#	exit -1
-#fi
+if [ `whoami` != "root" ];then
+	echo "<error>: latch me with root priority please."
+	exit -1
+fi
 
 cd $BASEDIR
 
@@ -64,7 +64,7 @@ fi
 #elevate privilege.
 if [ -e "/dev/ttyTHS2" ];then
 	addLog2File "elevate privilege /dev/ttyTHS2."
-	#chmod 777 /dev/ttyTHS2
+	sudo chmod 777 /dev/ttyTHS2
 fi
 
 #dump myself pid to file.
@@ -91,7 +91,7 @@ do
     fi
     if [ $bStartCamBridge -eq 1 ];then
 	    addLog2File "/tmp/zcambridge.pid detected failed,launch it again."
-	    ./zcambridge.bin &
+	    ./zcambridge.bin "v4l2src device=/dev/video0 ! video/x-raw,width=(int)640,height=(int)480,framerate=(fraction)30/1 ! queue ! nvvidconv ! omxh264enc ! rtph264pay name=pay0 pt=96" &
     fi
 
     #check the p16(audio/json/uart) server.

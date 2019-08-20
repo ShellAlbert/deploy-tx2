@@ -110,10 +110,10 @@ void ZMainUI::ZSlotHelp2Exit()
     {
         bExitAllFlag=false;
     }
-    if(!this->m_video->ZIsCleanup())
-    {
-        bExitAllFlag=false;
-    }
+//    if(!this->m_video->ZIsCleanup())
+//    {
+//        bExitAllFlag=false;
+//    }
 
     if(bExitAllFlag)
     {
