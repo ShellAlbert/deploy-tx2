@@ -308,10 +308,12 @@ void ZNoiseCutThread::run()
             break;
         case 2:
             //qDebug()<<"DeNoise:WebRTC Enabled";
+        if(gGblPara.m_audio.m_bWebRtcInitFlag)
         {
             ns_uninit();
             char customBandGains[8]={0};
             ns_custom_init(6,gGblPara.m_audio.m_nDenoiseGrade,0,0,customBandGains,0);
+            gGblPara.m_audio.m_bWebRtcInitFlag=false;
         }
             this->ZCutNoiseByWebRTC(pcmIn);
             break;

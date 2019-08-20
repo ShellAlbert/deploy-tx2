@@ -115,6 +115,7 @@ public:
     qint32 m_nGaindB;
     //default webRTC grade.0,1,2.
     qint32 m_nWebRtcNsPolicy;
+    bool m_bWebRtcInitFlag;
 public:
     //capture thread thread buffer overrun.
     qint32 m_nCapOverrun;

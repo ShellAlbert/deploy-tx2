@@ -278,6 +278,7 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                 }else if(deNoise=="WebRTC")
                 {
                     gGblPara.m_audio.m_nDeNoiseMethod=2;
+                    gGblPara.m_audio.m_bWebRtcInitFlag=true;
                 }else if(deNoise=="Bevis")
                 {
                     gGblPara.m_audio.m_nDeNoiseMethod=3;

@@ -34,6 +34,7 @@ ZAudioParam::ZAudioParam()
     //default webRTC grade is 0.
     //valid range is 0.1.2.
     this->m_nWebRtcNsPolicy=0;
+    this->m_bWebRtcInitFlag=false;
 
     //libns_professional 2019/6/27.
     this->m_nBandGain0=0;
