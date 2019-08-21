@@ -79,11 +79,7 @@ costMs:算法实际消耗的时间(毫秒)
 #include "rtsp/zrtspaudiocapture.h"
 #include "zgblpara.h"
 
-#ifdef BUILD_ZSY_GUI_SUPPORT
-#include <QApplication>
-#else
 #include <QCoreApplication>
-#endif
 #include <QDateTime>
 #include <QSettings>
 #include <QFile>
@@ -127,12 +123,14 @@ void gCustomMessageHandler(QtMsgType type,const QMessageLogContext &context, con
 int main(int argc, char *argv[])
 {
     int ret;
-#ifdef BUILD_ZSY_GUI_SUPPORT
-    QApplication p16(argc, argv);
-#else
-    QCoreApplication p16(argc, argv);
-#endif
 
+    QCoreApplication p16(argc, argv);
+
+    //install signal handler.
+    //Set the signal callback for Ctrl-C
+    signal(SIGINT,gSIGHandler);
+
+    //install qt message handler.
     qInstallMessageHandler(gCustomMessageHandler);
 
     //    ZRtspAudioCapture *cap=new ZRtspAudioCapture;
@@ -173,25 +171,6 @@ int main(int argc, char *argv[])
     }
 
     //4.ui.
-#ifdef BUILD_ZSY_GUI_SUPPORT
-    ZMainUI *ui=new ZMainUI;
-    if(ui->ZDoInit()<0)
-    {
-        qDebug()<<"<error>:failed to initial main window.";
-        return -1;
-    }
-    //5.video task.
-    ZVideoTask *video=new ZVideoTask;
-    if(video->ZStartTask(ui)<0)
-    {
-        qDebug()<<"<error>:failed to start video task.";
-        return -1;
-    }
-
-    //6.manage threads.
-    ui->ZManageThreads(audio,tcp2uart,json,video);
-    ui->showMaximized();
-#else
     ZMainObj *ui=new ZMainObj;
     if(ui->ZDoInit()<0)
     {
@@ -201,11 +180,8 @@ int main(int argc, char *argv[])
     //6.manage threads.
     ui->ZManageThreads(audio,tcp2uart,json,NULL);
     ui->showMaximized();
-#endif
 
-    //install signal handler.
-    //Set the signal callback for Ctrl-C
-    signal(SIGINT,gSIGHandler);
+
 
     //write pid to file.
     QFile filePID("/tmp/p16.pid");
@@ -227,11 +203,6 @@ int main(int argc, char *argv[])
     //free resources.
     delete audio;
     audio=NULL;
-
-#ifdef BUILD_ZSY_GUI_SUPPORT
-    delete video;
-    video=NULL;
-#endif
 
     delete tcp2uart;
     tcp2uart=NULL;

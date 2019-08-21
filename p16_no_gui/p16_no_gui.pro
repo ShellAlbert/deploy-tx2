@@ -1,12 +1,12 @@
 
-QT += core gui serialport network script
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT += core serialport network script
 
-#CONFIG += c++11 console
+
+#CONFIG += c++11
 #CONFIG -= app_bundle
 
-CONFIG += c++11
-TARGET = p16.bin
+CONFIG += c++11 console
+TARGET = p16_no_gui.bin
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -64,14 +64,12 @@ SOURCES += main.cpp \
     webrtc/vector_scaling_operations.c \
     json/zjsonthread.cpp \
     forward/ztcp2uartthread.cpp \
-    imgproc/zimgprocthread.cpp \
-    imgproc/zrtspthread.cpp \
-    ui/zimgdispui.cpp \
+    #imgproc/zimgprocthread.cpp \
+    #imgproc/zrtspthread.cpp \
+    #ui/zimgdispui.cpp \
     ui/zmainui.cpp \
-    imgproc/zvideotask.cpp \
+    #imgproc/zvideotask.cpp \
     rtsp/zrtspaudiocapture.cpp
-    #libns.c
-
 
 HEADERS += \
     webrtc/analog_agc.h \
@@ -101,11 +99,11 @@ HEADERS += \
     alsa/znoisecutthread.h \
     json/zjsonthread.h \
     forward/ztcp2uartthread.h \
-    imgproc/zimgprocthread.h \
-    imgproc/zrtspthread.h \
-    ui/zimgdispui.h \
+    #imgproc/zimgprocthread.h \
+    #imgproc/zrtspthread.h \
+    #ui/zimgdispui.h \
     ui/zmainui.h \
-    imgproc/zvideotask.h \
+    #imgproc/zvideotask.h \
     rtsp/zrtspaudiocapture.h
 
 INCLUDEPATH += /usr/include/gstreamer-1.0
