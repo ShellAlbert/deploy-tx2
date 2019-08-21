@@ -41,7 +41,7 @@ void ZJsonThread::run()
         //listen.
         if(!tcpServer->listen(QHostAddress::Any,TCP_PORT_CTL))
         {
-            qDebug()<<"<Error>: Ctl server listen error on port:"<<TCP_PORT_CTL;
+            qCritical()<<"JsonServer failed to listen on port:"<<TCP_PORT_CTL;
             gGblPara.m_bGblRst2Exit=true;
             break;
         }
@@ -64,7 +64,7 @@ void ZJsonThread::run()
         this->m_tcpSocket=tcpServer->nextPendingConnection();
         if(NULL==this->m_tcpSocket)
         {
-            qDebug()<<"<Error>:empty next pending connection.";
+            qCritical()<<"JsonServer empty next pending connection.";
             continue;
         }
 
@@ -80,7 +80,7 @@ void ZJsonThread::run()
                 QByteArray baJsonData=this->m_tcpSocket->readAll();
                 if(baJsonData.size()<=0)
                 {
-                    qDebug()<<"<Warning>:not read any json data.";
+                    qCritical()<<"JsonServer not read any json data.";
                     continue;
                 }
                 //                qDebug()<<"----------------read all begin-----------";
@@ -114,20 +114,20 @@ void ZJsonThread::run()
                 this->m_tcpSocket->write(baTxLen);
                 if(!this->m_tcpSocket->waitForBytesWritten(1000))
                 {
-                    qDebug()<<"<Error>:json tcp socket timeout.reset";
+                    qCritical()<<"JsonServer tcp socket timeout,reset.";
                     break;
                 }
                 this->m_tcpSocket->write(baTx);
                 if(!this->m_tcpSocket->waitForBytesWritten(1000))
                 {
-                    qDebug()<<"<Error>:json tcp socket timeout.reset";
+                    qCritical()<<"JsonServer tcp socket timeout2,reset.";
                     break;
                 }
             }
 #endif
             if(this->m_tcpSocket->state()!=QAbstractSocket::ConnectedState)
             {
-                qDebug()<<"<Error>:tcp socket broken.";
+                qCritical()<<"JsonServer tcp socket broken.";
                 break;
             }
         }
@@ -139,7 +139,7 @@ void ZJsonThread::run()
     delete tcpServer;
     tcpServer=NULL;
 
-    qDebug()<<"<MainLoop>:JsonThread ends.";
+    qInfo()<<"<MainLoop>:JsonThread ends.";
     //set global request exit flag to notify other threads.
     gGblPara.m_bGblRst2Exit=true;
     this->m_bCleanup=true;
@@ -165,7 +165,7 @@ qint32 ZJsonThread::ZScanRecvBuffer()
         qint32 nJsonLen=QByteArrayToqint32(baJsonLen);
         if(nJsonLen<0)
         {
-            qDebug()<<"<Error>:error convert json pkt len.reset.";
+            qDebug()<<"JsonServer error convert json pkt len,reset.";
             this->m_nJsonLen=0;
             return -1;
         }
@@ -268,7 +268,7 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
             if(val.isString())
             {
                 QString deNoise=val.toVariant().toString();
-                qDebug()<<"deNoise:"<<deNoise;
+                qDebug()<<"JsonServer deNoise:"<<deNoise;
                 if(deNoise=="off")
                 {
                     gGblPara.m_audio.m_nDeNoiseMethod=0;
@@ -317,7 +317,7 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
             if(val.isString())
             {
                 QString webRtcGrade=val.toVariant().toString();
-                //qDebug()<<"webRtcGrade:"<<webRtcGrade;
+                qDebug()<<"JsonServer webRtcGrade:"<<webRtcGrade;
                 if(webRtcGrade=="0")
                 {
                     gGblPara.m_audio.m_nWebRtcNsPolicy=0;
@@ -358,7 +358,7 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                     jsonObjFeedBack.insert("DGain",QString::number(gGblPara.m_audio.m_nGaindB));
                 }else{
                     qint32 dGain=val.toVariant().toInt();
-                    //qDebug()<<"DGain:"<<dGain;
+                    qDebug()<<"JsonServer DGain:"<<dGain;
                     gGblPara.m_audio.m_nGaindB=dGain;
                     jsonObjFeedBack.insert("DGain",QString::number(gGblPara.m_audio.m_nGaindB));
                 }
@@ -377,7 +377,7 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                     QStringList xyList=cam1CenterXY.split(",");
                     if(xyList.size()!=2)
                     {
-                        qDebug()<<"<Error>:failed to parse out (x,y) in Cam1CenterXY json.";
+                        qDebug()<<"JsonServer failed to parse out (x,y) in Cam1CenterXY json.";
                     }else{
                         qint32 x=xyList.at(0).toInt();
                         qint32 y=xyList.at(1).toInt();
@@ -402,7 +402,7 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                     QStringList xyList=cam2CenterXY.split(",");
                     if(xyList.size()!=2)
                     {
-                        qDebug()<<"<Error>:failed to parse out (x,y) in Cam1CenterXY json.";
+                        qDebug()<<"JsonServer failed to parse out (x,y) in Cam1CenterXY json.";
                     }else{
                         qint32 x=xyList.at(0).toInt();
                         qint32 y=xyList.at(1).toInt();
@@ -427,7 +427,7 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                     QStringList xyList=cam3CenterXY.split(",");
                     if(xyList.size()!=2)
                     {
-                        qDebug()<<"<Error>:failed to parse out (x,y) in Cam3CenterXY json.";
+                        qDebug()<<"JsonServer failed to parse out (x,y) in Cam3CenterXY json.";
                     }else{
                         qint32 x=xyList.at(0).toInt();
                         qint32 y=xyList.at(1).toInt();
@@ -449,21 +449,7 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                 {
                     jsonObjFeedBack.insert("Accumulated","0");
                 }else{
-                    qDebug()<<"<Error>:unknow cmd in Accumulated json.";
-                }
-            }
-        }
-        if(jsonObj.contains("Accumulated"))
-        {
-            QJsonValue val=jsonObj.take("Accumulated");
-            if(val.isString())
-            {
-                QString str=val.toVariant().toString();
-                if(str=="query")
-                {
-                    jsonObjFeedBack.insert("Accumulated",QString::number(gGblPara.m_nAccumulatedSec));
-                }else{
-                    qDebug()<<"<Error>:unknow cmd in Accumulated json.";
+                    qDebug()<<"JsonServer unknow cmd in Accumulated json.";
                 }
             }
         }
@@ -474,6 +460,7 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
             if(val.isString())
             {
                 QString noiseView=val.toVariant().toString();
+                qDebug()<<"JsonServer StrongMode="<<noiseView;
                 if(noiseView=="mode1")
                 {
                     gGblPara.m_audio.m_nRNNoiseView=0;
@@ -617,7 +604,7 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                 }
                 jsonObjFeedBack.insert("NRAEPara",jsonObjFeedBackNRAE);
             }else{
-                qDebug()<<"has error";
+                qDebug()<<"JsonServer NRAEPara has error!";
             }
         }
 
@@ -626,7 +613,7 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
             gGblPara.writeCfgFile();
         }
     }else{
-        qDebug()<<"<Error>:CtlThread,failed to parse json.";
+        qDebug()<<"JsonServer failed to parse json text.";
     }
     QJsonDocument jsonDocFeedBack;
     jsonDocFeedBack.setObject(jsonObjFeedBack);

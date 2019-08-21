@@ -84,6 +84,7 @@ costMs:算法实际消耗的时间(毫秒)
 #include <QSettings>
 #include <QFile>
 #include <QDebug>
+#include <QMutex>
 
 #include <signal.h>
 #include <pthread.h>
@@ -98,7 +99,7 @@ void gSIGHandler(int sigNo)
     case SIGINT:
     case SIGKILL:
     case SIGTERM:
-        qDebug()<<"prepare to exit...";
+        qInfo()<<"got signal,prepare to exit...";
         gGblPara.m_bGblRst2Exit=true;
         break;
     default:
@@ -107,16 +108,41 @@ void gSIGHandler(int sigNo)
 }
 void gCustomMessageHandler(QtMsgType type,const QMessageLogContext &context, const QString &msg)
 {
+    Q_UNUSED(context);
+
+    QString msgType;
+    static QMutex mutex;
+    mutex.lock();
     switch(type)
     {
+    case QtInfoMsg:
+        msgType=QString("<INFO>");
+        break;
     case QtDebugMsg:
+        msgType=QString("<DEBUG>");
         break;
     case QtWarningMsg:
+        msgType=QString("<WARNING>");
         break;
     case QtCriticalMsg:
+        msgType=QString("<CRITICAL>");
         break;
     case QtFatalMsg:
+        msgType=QString("<FATAL>");
         break;
+    default:
+        break;
+    }
+    QString logMsg=QString("%1:%2\r\n").arg(msgType).arg(msg);
+    QFile fileLog("p16.log");
+    fileLog.open(QIODevice::WriteOnly|QIODevice::Append);
+    fileLog.write(logMsg.toLatin1());
+    fileLog.close();
+    mutex.unlock();
+
+    if(type==QtFatalMsg)
+    {
+        abort();
     }
 }
 
@@ -150,7 +176,7 @@ int main(int argc, char *argv[])
     ZAudioTask *audio=new ZAudioTask;
     if(audio->ZStartTask()<0)
     {
-        qDebug()<<"<error>:failed to start audio task!";
+        qCritical()<<"failed to start audio task!";
         return -1;
     }
 
@@ -158,7 +184,7 @@ int main(int argc, char *argv[])
     ZTcp2UartForwardThread *tcp2uart=new ZTcp2UartForwardThread;
     if(tcp2uart->ZStartThread()<0)
     {
-        qDebug()<<"<error>:failed to start tcp2uart thread!";
+        qCritical()<<"failed to start tcp2uart thread!";
         return -1;
     }
 
@@ -166,7 +192,7 @@ int main(int argc, char *argv[])
     ZJsonThread *json=new ZJsonThread;
     if(json->ZStartThread()<0)
     {
-        qDebug()<<"<error>:failed to start json thread!";
+        qCritical()<<"failed to start json thread!";
         return -1;
     }
 
@@ -174,7 +200,7 @@ int main(int argc, char *argv[])
     ZMainObj *ui=new ZMainObj;
     if(ui->ZDoInit()<0)
     {
-        qDebug()<<"<error>:failed to initial main window.";
+        qCritical()<<"failed to initial main window.";
         return -1;
     }
     //6.manage threads.
@@ -187,7 +213,7 @@ int main(int argc, char *argv[])
     QFile filePID("/tmp/p16.pid");
     if(!filePID.open(QIODevice::WriteOnly))
     {
-        qDebug()<<"<error>:error to write pid file."<<filePID.errorString();
+        qCritical()<<"failed to write pid to file:"<<filePID.errorString()<<".";
         return -1;
     }
     char pidBuffer[32];
@@ -195,7 +221,6 @@ int main(int argc, char *argv[])
     sprintf(pidBuffer,"%d",getpid());
     filePID.write(pidBuffer,strlen(pidBuffer));
     filePID.close();
-    qDebug()<<"write pid to /tmp/p16.pid,"<<pidBuffer<<".";
 
     //enter event loop until exit() was called.
     ret=p16.exec();
@@ -213,7 +238,7 @@ int main(int argc, char *argv[])
     delete ui;
     ui=NULL;
 
-    qDebug()<<"<exit>:done.";
+    qInfo()<<"p16 done.\r\n\r\n";
     return ret;
 #endif
 }

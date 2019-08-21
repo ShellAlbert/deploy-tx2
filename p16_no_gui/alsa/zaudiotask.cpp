@@ -113,7 +113,7 @@ void ZAudioTask::ZSlotTimeout()
         //here we move a element from Cap2NsUsedQueue to Cap2NsFreeQueue to unblock.
         if(!this->m_capThread->ZIsExitCleanup())
         {
-            qDebug()<<"<Exiting>:waiting for AudioCaptureThread.";
+            qInfo()<<"AudioTask exit,waiting for AudioCaptureThread.";
             this->m_Cap2NsFIFOMutex.lock();
             if(!this->m_Cap2NsFIFOUsed.isEmpty())
             {
@@ -132,7 +132,7 @@ void ZAudioTask::ZSlotTimeout()
         //here we move a element from Ns2TxUsedQueue to Ns2TxFreeQueue to unblock.
         if(!this->m_cutThread->ZIsExitCleanup())
         {
-            qDebug()<<"<Exiting>:waiting for NoiseCutThread.";
+            qInfo()<<"AudioTask exit,waiting for NoiseCutThread.";
             this->m_Cap2NsFIFOMutex.lock();
             if(!this->m_Cap2NsFIFOFree.isEmpty())
             {
@@ -165,7 +165,7 @@ void ZAudioTask::ZSlotTimeout()
         //here we move a element from Ns2PbFreeQueue to Ns2PbUsedQueue to unblock.
         if(!this->m_playThread->ZIsExitCleanup())
         {
-            qDebug()<<"<Exiting>:waiting for AudioPlayThread.";
+            qInfo()<<"AudioTask exit,waiting for AudioPlayThread.";
             this->m_Ns2PbFIFOMutex.lock();
             if(!this->m_Ns2PbFIFOFree.isEmpty())
             {
@@ -180,7 +180,7 @@ void ZAudioTask::ZSlotTimeout()
         //here we move a element from Ns2TxFreeQueue to Ns2TxUsedQueue to unblock.
         if(!this->m_txThread->ZIsExitCleanup())
         {
-            qDebug()<<"<Exiting>:waiting for AudioTxThread.";
+            qInfo()<<"AudioTask exit,waiting for AudioTxThread.";
             this->m_Ns2TxFIFOMutex.lock();
             if(!this->m_Ns2TxFIFOFree.isEmpty())
             {

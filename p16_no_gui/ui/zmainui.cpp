@@ -4,7 +4,6 @@
 #include "forward/ztcp2uartthread.h"
 #include "json/zjsonthread.h"
 #include "imgproc/zvideotask.h"
-
 #include <QCoreApplication>
 ZMainObj::ZMainObj(QObject *parent):QObject(parent)
 {
@@ -58,13 +57,7 @@ void ZMainObj::ZSlotHelp2Exit()
             bExitAllFlag=false;
         }
     }
-    if(this->m_video!=NULL)
-    {
-        if(!this->m_video->ZIsCleanup())
-        {
-            bExitAllFlag=false;
-        }
-    }
+
 
     if(bExitAllFlag)
     {

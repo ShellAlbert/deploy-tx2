@@ -53,8 +53,7 @@ void ZAudioPlayThread::run()
     /* been completely processed by the soundcard.                */
     if((nRet=snd_pcm_open(&this->m_pcmHandle,this->m_playCardName.toLatin1().data(),SND_PCM_STREAM_PLAYBACK,0))<0)
     {
-        qDebug()<<"<Error>:Audio PlayThread,error at snd_pcm_open():"<<this->m_playCardName;
-        qDebug()<<snd_strerror(nRet);
+        qCritical()<<"AudioPlay,error at snd_pcm_open():"<<this->m_playCardName<<snd_strerror(nRet);
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;

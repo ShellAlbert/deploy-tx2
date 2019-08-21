@@ -71,8 +71,7 @@ void ZAudioCaptureThread::run()
     /* been completely processed by the soundcard.                */
     if((nRet=snd_pcm_open(&pcmHandle,this->m_capDevName.toLatin1().data(),SND_PCM_STREAM_CAPTURE,0))<0)
     {
-        qDebug()<<"<Error>:Audio CapThread,error to open pcm device "<<this->m_capDevName;
-        qDebug()<<snd_strerror(nRet);
+        qCritical()<<"AudioCapture,failed to open pcm device "<<this->m_capDevName<<","<<snd_strerror(nRet);
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
@@ -88,7 +87,7 @@ void ZAudioCaptureThread::run()
     snd_pcm_hw_params_alloca(&hwparams);
     if(snd_pcm_hw_params_any(pcmHandle,hwparams)<0)
     {
-        qDebug()<<"<Error>:Audio CapThread,Cannot configure this PCM device.";
+        qCritical()<<"AudioCapture,failed to configure PCM device.";
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
@@ -128,7 +127,7 @@ void ZAudioCaptureThread::run()
     /* of this introduction.                  */
     if(snd_pcm_hw_params_set_access(pcmHandle,hwparams,SND_PCM_ACCESS_RW_INTERLEAVED)<0)
     {
-        qDebug()<<"<Error>:Audio CapThread,error at snd_pcm_hw_params_set_access().";
+        qCritical()<<"AudioCapture,error at snd_pcm_hw_params_set_access().";
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
@@ -137,7 +136,7 @@ void ZAudioCaptureThread::run()
     /* Set sample format */
     if(snd_pcm_hw_params_set_format(pcmHandle,hwparams,SND_PCM_FORMAT_S16_LE)<0)
     {
-        qDebug()<<"<Error>:Audio CapThread,error at snd_pcm_hw_params_set_format().";
+        qCritical()<<"AudioCapture,error at snd_pcm_hw_params_set_format().";
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
@@ -148,21 +147,20 @@ void ZAudioCaptureThread::run()
     unsigned int nNearSampleRate=SAMPLE_RATE;
     if(snd_pcm_hw_params_set_rate_near(pcmHandle,hwparams,&nNearSampleRate,0u)<0)
     {
-        qDebug()<<"<Error>:Audio CapThread,error at snd_pcm_hw_params_set_rate_near().";
+        qCritical()<<"AudioCapture,error at snd_pcm_hw_params_set_rate_near().";
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
     }
     if(nNearSampleRate!=SAMPLE_RATE)
     {
-        qDebug()<<"<Warning>:Audio CapThread,the sampled rate "<<SAMPLE_RATE<<" Hz is not supported by hardware.";
-        qDebug()<<"<Warning>:Using "<<nNearSampleRate<<" Hz instead.";
+        qWarning()<<"AudioCapture,the sampled rate "<<SAMPLE_RATE<<"Hz is not supported by hardware,"<<"Using"<<nNearSampleRate<<" Hz instead.";
     }
 
     /* Set number of channels */
     if(snd_pcm_hw_params_set_channels(pcmHandle,hwparams,CHANNELS_NUM)<0)
     {
-        qDebug()<<"<Error>:CapThread,error at snd_pcm_hw_params_set_channels().";
+        qCritical()<<"<Error>:CapThread,error at snd_pcm_hw_params_set_channels().";
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
@@ -176,14 +174,14 @@ void ZAudioCaptureThread::run()
     //	Restrict a configuration space to contain only one periods count
     if(snd_pcm_hw_params_set_periods_near(pcmHandle,hwparams,&request_periods,&dir)<0)
     {
-        qDebug("<Error>:Audio CapThread,error at setting periods.\n");
+        qCritical("AudioCapture,error at setting periods.\n");
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
     }
     if((int)request_periods!=periods)
     {
-        qDebug("<Warning>:Audio CapThread,requested %d periods,but recieved %d.\n", request_periods, periods);
+        qWarning("AudioCapture,requested %d periods,but recieved %d.\n", request_periods, periods);
     }
 
     /*
@@ -196,14 +194,14 @@ void ZAudioCaptureThread::run()
     snd_pcm_uframes_t bufferSizeInFrames2=bufferSizeInFrames;
     if(snd_pcm_hw_params_set_buffer_size_near(pcmHandle,hwparams,&bufferSizeInFrames)<0)
     {
-        qDebug()<<"<Error>:CapThread,error at snd_pcm_hw_params_set_buffer_size_near().";
+        qCritical()<<"AudioCapture,error at snd_pcm_hw_params_set_buffer_size_near().";
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
     }
     if(bufferSizeInFrames!=bufferSizeInFrames2)
     {
-        qDebug()<<"request buffer size:"<<bufferSizeInFrames2<<",really:"<<bufferSizeInFrames;
+        qWarning()<<"AudioCapture,request buffer size:"<<bufferSizeInFrames2<<",really:"<<bufferSizeInFrames;
     }
 
     /*
@@ -216,7 +214,7 @@ void ZAudioCaptureThread::run()
     /* Apply HW parameter settings to PCM device and prepare device*/
     if(snd_pcm_hw_params(pcmHandle,hwparams)<0)
     {
-        qDebug()<<"<Error>:Audio CapThread,error at snd_pcm_hw_params().";
+        qCritical()<<"AudioCapture,error at snd_pcm_hw_params().";
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
@@ -224,7 +222,7 @@ void ZAudioCaptureThread::run()
 
 
     //the main-loop.
-    qDebug()<<"<MainLoop>:Audio CaptureThread starts.";
+    qInfo()<<"AudioCapture,main loop starts.";
     this->m_bCleanup=false;
     while(!gGblPara.m_bGblRst2Exit)
     {
@@ -256,7 +254,7 @@ void ZAudioCaptureThread::run()
             if(nRet<0)
             {
                 snd_pcm_prepare(pcmHandle);
-                qDebug()<<"<ALSA Capture>:Buffer Overrun";
+                qWarning()<<"AudioCapture,Buffer Overrun!";
                 gGblPara.m_audio.m_nCapOverrun++;
                 continue;
             }else{
@@ -284,7 +282,7 @@ void ZAudioCaptureThread::run()
     //snd_pcm_drain(pcmHandle);
     snd_pcm_close(pcmHandle);
 
-    qDebug()<<"<MainLoop>:CaptureThread ends.";
+    qInfo()<<"AudioCapture,main loop ends.";
     //set global request to exit flag to help other thread to exit.
     gGblPara.m_bGblRst2Exit=true;
     emit this->ZSigThreadFinished();
