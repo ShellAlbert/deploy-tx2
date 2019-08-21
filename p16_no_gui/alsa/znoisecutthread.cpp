@@ -81,7 +81,7 @@ void ZNoiseCutThread::run()
     qint32 nWebRtcNsPolicy=gGblPara.m_audio.m_nWebRtcNsPolicy;
     if(0!=WebRtcNs_Create(&this->m_pNS_inst))
     {
-        qDebug()<<"<Error>:NoiseCut,error at WebRtcNs_Create().";
+        qCritical()<<"NoiseCut,error at WebRtcNs_Create().";
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
@@ -90,14 +90,14 @@ void ZNoiseCutThread::run()
     //CAUTION HERE: it does not support 48khz!!!
     if(0!=WebRtcNs_Init(this->m_pNS_inst,/*32000*/16000))
     {
-        qDebug()<<"<Error>:NoiseCut,error at WebRtcNs_Init().";
+        qCritical()<<"NoiseCut,error at WebRtcNs_Init().";
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
     }
     if(0!=WebRtcNs_set_policy(this->m_pNS_inst,nWebRtcNsPolicy))
     {
-        qDebug()<<"<Error>:NoiseCut,error at WebRtcNs_set_policy().";
+        qCritical()<<"NoiseCut,error at WebRtcNs_set_policy().";
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
@@ -147,11 +147,11 @@ void ZNoiseCutThread::run()
     this->m_pcm16k=new char[PERIOD_SIZE];
     if(NULL==this->m_pcm16k)
     {
-        qDebug()<<"<Error>:failed to allocate buffer form pcm16k!";
+        qCritical()<<"NoiseCut,failed to allocate buffer form pcm16k!";
         return;
     }
 
-    qDebug()<<"<MainLoop>:Audio NoiseSuppressThread starts.";
+    qInfo()<<"NoiseCut,main loop starts.";
     this->m_bCleanup=false;
 
     //for libns.
@@ -168,7 +168,7 @@ void ZNoiseCutThread::run()
     memset(customBandGains,0,8);
     if(ns_custom_init(denoiseAlgorithm, denoiseLevel, enhancedType, enhancedLevel, customBandGains, preEmphasisFlag))
     {
-        qDebug()<<"<Error>:NoiseCut,failed to init ns_custom_init().";
+        qCritical()<<"NoiseCut,failed to init ns_custom_init().";
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
@@ -192,21 +192,21 @@ void ZNoiseCutThread::run()
             //re-init webRTC.
             if(0!=WebRtcNs_Create(&this->m_pNS_inst))
             {
-                qDebug()<<"<Error>:NoiseCut,error at WebRtcNs_Create().";
+                qCritical()<<"NoiseCut,error at WebRtcNs_Create().";
                 //set global request to exit flag to cause other threads to exit.
                 gGblPara.m_bGblRst2Exit=true;
                 break;
             }
             if(0!=WebRtcNs_Init(this->m_pNS_inst,/*32000*/16000))
             {
-                qDebug()<<"<Error>:NoiseCut,error at WebRtcNs_Init().";
+                qCritical()<<"NoiseCut,error at WebRtcNs_Init().";
                 //set global request to exit flag to cause other threads to exit.
                 gGblPara.m_bGblRst2Exit=true;
                 break;
             }
             if(0!=WebRtcNs_set_policy(this->m_pNS_inst,nWebRtcNsPolicy))
             {
-                qDebug()<<"<Error>:NoiseCut,error at WebRtcNs_set_policy().";
+                qCritical()<<"NoiseCut,error at WebRtcNs_set_policy().";
                 //set global request to exit flag to cause other threads to exit.
                 gGblPara.m_bGblRst2Exit=true;
                 break;
@@ -263,7 +263,7 @@ void ZNoiseCutThread::run()
 
             //update flag.
             nGaindBShadow=gGblPara.m_audio.m_nGaindB;
-            qDebug()<<"noise cut update dgain to "<<nGaindBShadow;
+            qDebug()<<"NoiseCut,update DGain to "<<nGaindBShadow;
         }
 
 #endif
@@ -425,7 +425,7 @@ void ZNoiseCutThread::run()
     //uninit libns.
     ns_uninit();
 
-    qDebug()<<"<MainLoop>:NoiseSuppressThread ends.";
+    qInfo()<<"NoiseCut,main loop ends.";
     //set global request to exit flag to help other thread to exit.
     gGblPara.m_bGblRst2Exit=true;
     emit this->ZSigThreadFinished();
@@ -558,7 +558,7 @@ qint32 ZNoiseCutThread::ZDGainByWebRTC(QByteArray *baPCM)
         int nAgcRet = WebRtcAgc_Process(this->m_agcHandle,this->m_pDataIn,NULL,frameSize,this->m_pDataOut,NULL,inMicLevel,&outMicLevel,0,&saturationWarning);
         if(nAgcRet!=0)
         {
-            qDebug()<<"<Error>:error at WebRtcAgc_Process().";
+            qCritical()<<"NoiseCut,error at WebRtcAgc_Process().";
             return -1;
         }
         micLevelIn=outMicLevel;

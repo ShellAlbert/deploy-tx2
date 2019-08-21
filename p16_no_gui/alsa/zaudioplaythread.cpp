@@ -71,7 +71,7 @@ void ZAudioPlayThread::run()
     /* Init hwparams with full configuration space */
     if(snd_pcm_hw_params_any(this->m_pcmHandle,hwparams)<0)
     {
-        qDebug()<<"<Error>:Audio PlayThread,error at snd_pcm_hw_params_any().";
+        qCritical()<<"AudioPlay,error at snd_pcm_hw_params_any().";
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
@@ -112,7 +112,7 @@ void ZAudioPlayThread::run()
     /* of this introduction.                  */
     if(snd_pcm_hw_params_set_access(this->m_pcmHandle,hwparams,SND_PCM_ACCESS_RW_INTERLEAVED)<0)
     {
-        qDebug()<<"<Error>:Audio PlayThread,error at snd_pcm_hw_params_set_access().";
+        qCritical()<<"AudioPlay,error at snd_pcm_hw_params_set_access().";
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
@@ -121,7 +121,7 @@ void ZAudioPlayThread::run()
     /* Set sample format */
     if(snd_pcm_hw_params_set_format(this->m_pcmHandle,hwparams,SND_PCM_FORMAT_S16_LE)<0)
     {
-        qDebug()<<"<Error>:Audio PlayThread,error at snd_pcm_hw_params_set_format().";
+        qCritical()<<"AudioPlay,error at snd_pcm_hw_params_set_format().";
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
@@ -132,21 +132,20 @@ void ZAudioPlayThread::run()
     unsigned int nRealSampleRate=SAMPLE_RATE;
     if(snd_pcm_hw_params_set_rate_near(this->m_pcmHandle,hwparams,&nRealSampleRate,0u)<0)
     {
-        qDebug()<<"<Error>:Audio PlayThread,error at snd_pcm_hw_params_set_rate_near().";
+        qCritical()<<"AudioPlay,error at snd_pcm_hw_params_set_rate_near().";
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
     }
     if(nRealSampleRate!=SAMPLE_RATE)
     {
-        qDebug()<<"<Warning>:Audio PlayThread,the rate "<<SAMPLE_RATE<<" Hz is not supported by hardware.";
-        qDebug()<<"<Warning>:Using "<<nRealSampleRate<<" instead.";
+        qWarning()<<"AudioPlay,the rate "<<SAMPLE_RATE<<" Hz is not supported by hardware.Using "<<nRealSampleRate<<" instead.";
     }
 
     /* Set number of channels */
     if(snd_pcm_hw_params_set_channels(this->m_pcmHandle,hwparams,CHANNELS_NUM)<0)
     {
-        qDebug()<<"<Error>:Audio PlayThread,error at snd_pcm_hw_params_set_channels().";
+        qCritical()<<"AudioPlay,error at snd_pcm_hw_params_set_channels().";
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
@@ -159,14 +158,14 @@ void ZAudioPlayThread::run()
     //	Restrict a configuration space to contain only one periods count
     if(snd_pcm_hw_params_set_periods_near(this->m_pcmHandle,hwparams,&request_periods,&dir)<0)
     {
-        qDebug()<<"<Error>:Audio PlayThread,error at snd_pcm_hw_params_set_periods_near().";
+        qCritical()<<"AudioPlay,error at snd_pcm_hw_params_set_periods_near().";
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
     }
     if((int)request_periods!=periods)
     {
-        qDebug("<Warning>:Audio PlayThread,requested %d periods,but recieved %d.\n", request_periods, periods);
+        qWarning("AudioPlay,requested %d periods,but recieved %d.\n", request_periods, periods);
     }
 
     /*
@@ -179,14 +178,14 @@ void ZAudioPlayThread::run()
     snd_pcm_uframes_t bufferSizeInFrames2=bufferSizeInFrames;
     if(snd_pcm_hw_params_set_buffer_size_near(this->m_pcmHandle,hwparams,&bufferSizeInFrames)<0)
     {
-        qDebug()<<"<Error>:Audio PlayThread,error at snd_pcm_hw_params_set_buffer_size_near().";
+        qCritical()<<"AudioPlay,error at snd_pcm_hw_params_set_buffer_size_near().";
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
     }
     if(bufferSizeInFrames!=bufferSizeInFrames2)
     {
-        qDebug()<<"request buffer size:"<<bufferSizeInFrames2<<",really:"<<bufferSizeInFrames;
+        qWarning()<<"AudioPlay,request buffer size:"<<bufferSizeInFrames2<<",really:"<<bufferSizeInFrames;
     }
     /*
         If your hardware does not support a buffersize of 2^n,
@@ -198,14 +197,14 @@ void ZAudioPlayThread::run()
     /* Apply HW parameter settings to PCM device and prepare device*/
     if(snd_pcm_hw_params(this->m_pcmHandle,hwparams)<0)
     {
-        qDebug()<<"<Error>:Audio PlayThread,error at snd_pcm_hw_params().";
+        qCritical()<<"AudioPlay,error at snd_pcm_hw_params().";
         //set global request to exit flag to cause other threads to exit.
         gGblPara.m_bGblRst2Exit=true;
         return;
     }
 
     //the main loop.
-    qDebug()<<"<MainLoop>:PlaybackThread starts.";
+    qInfo()<<"AudioPlay,main loop starts.";
     this->m_bCleanup=false;
 
     //这里不能使用事件循环，还是需要用队列的方式
@@ -242,7 +241,7 @@ void ZAudioPlayThread::run()
             if(ret==-EPIPE)
             {
                 snd_pcm_prepare(this->m_pcmHandle);
-                qDebug()<<"<ALSA Playback>:Buffer Underrun\n";
+                qWarning()<<"AudioPlay,Buffer Underrun!\n";
                 continue;
             }else{
                 break;
@@ -267,7 +266,7 @@ void ZAudioPlayThread::run()
     /* Stop PCM device after pending frames have been played */
     //snd_pcm_drain(pcmHandle);
 
-    qDebug()<<"<MainLoop>:PlaybackThread ends.";
+    qInfo()<<"AudioPlay,main loop ends.";
     //set global request to exit flag to help other thread to exit.
     gGblPara.m_bGblRst2Exit=true;
     emit this->ZSigThreadFinished();
