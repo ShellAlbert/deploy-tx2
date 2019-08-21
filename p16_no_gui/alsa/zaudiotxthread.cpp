@@ -1,11 +1,15 @@
 #include "zaudiotxthread.h"
 #include "zgblpara.h"
+
+extern "C"
+{
 #include <opus/opus.h>
 #include <opus/opus_multistream.h>
 #include <opus/opus_defines.h>
 #include <opus/opus_types.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+}
 
 #define AUDIO_ENC_OPUS  1
 ZAudioTxThread::ZAudioTxThread()

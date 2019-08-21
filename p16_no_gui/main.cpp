@@ -86,12 +86,15 @@ costMs:算法实际消耗的时间(毫秒)
 #include <QDebug>
 #include <QMutex>
 
-#include <signal.h>
-#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <unistd.h>
+extern "C"
+{
+    #include <signal.h>
+    #include <pthread.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <errno.h>
+    #include <unistd.h>
+}
 void gSIGHandler(int sigNo)
 {
     switch(sigNo)
@@ -133,7 +136,7 @@ void gCustomMessageHandler(QtMsgType type,const QMessageLogContext &context, con
     default:
         break;
     }
-    QString logMsg=QString("%1:%2\r\n").arg(msgType).arg(msg);
+    QString logMsg=QString("%1:%2:%3\r\n").arg(msgType).arg(QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss")).arg(msg);
     QFile fileLog("p16.log");
     fileLog.open(QIODevice::WriteOnly|QIODevice::Append);
     fileLog.write(logMsg.toLatin1());

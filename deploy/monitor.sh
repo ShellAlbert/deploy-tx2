@@ -68,8 +68,21 @@ if [ -e "/dev/ttyTHS2" ];then
 fi
 
 #dump myself pid to file.
+if [ -f "/tmp/monitor.pid" ];then
+	echo "only one instance can be run!"
+	exit -1
+fi
+
+#clean pid files before running.
+#for manual debug.
+rm -rf /tmp/zcambridge.pid
+rm -rf /tmp/p16.pid
+
+#dump my pid to file.
 echo $$ > /tmp/monitor.pid
 
+#backup previous p16 log file.
+cp -f p16.log  p16.log.1
 
 #the main loop.
 while true
@@ -79,11 +92,11 @@ do
     bStartCamBridge=0
     if [ -f "/tmp/zcambridge.pid" ];then
         PID=`cat /tmp/zcambridge.pid`
-        kill -0 $PID
+        sudo kill -0 $PID
         if [ $? -eq 0 ];then
             echo "<okay>:cambridge pid detect okay."
         else
-	    kill -9 `cat /tmp/zcambridge.pid`
+	    sudo kill -9 `cat /tmp/zcambridge.pid`
 	    bStartCamBridge=1
         fi
     else
@@ -91,18 +104,19 @@ do
     fi
     if [ $bStartCamBridge -eq 1 ];then
 	    addLog2File "/tmp/zcambridge.pid detected failed,launch it again."
-	    ./zcambridge.bin > zcambridge.run.log 2>&1 &
+	    sleep 5
+	    sudo ./zcambridge.bin "v4l2src device=/dev/video0 ! video/x-raw,width=(int)640,height=(int)480,framerate=(fraction)30/1 ! queue ! nvvidconv ! omxh264enc ! rtph264pay name=pay0 pt=96" &
     fi
 
     #check the p16(audio/json/uart) server.
     bStartP16=0
     if [ -f "/tmp/p16.pid" ];then
         PID=`cat /tmp/p16.pid`
-        kill -0 $PID
+        sudo kill -0 $PID
         if [ $? -eq 0 ];then
             echo "<okay>:LizardTx2 pid detect okay."
         else
-	    kill -9 `cat /tmp/p16.pid`
+	    sudo kill -9 `cat /tmp/p16.pid`
 	    bStartP16=1
         fi
     else
@@ -110,7 +124,8 @@ do
     fi
     if [ $bStartP16 -eq 1 ];then
 	    addLog2File "/tmp/p16.pid detected failed,launch it again."
-	    ./p16.bin >p16.run.log 2>&1 &
+	    sleep 5
+	    sudo ./p16_no_gui.bin &
     fi
 
     #check periodly every 10 seconds.

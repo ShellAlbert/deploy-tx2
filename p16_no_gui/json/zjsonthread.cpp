@@ -1,7 +1,6 @@
 #include "zjsonthread.h"
 #include <QTcpServer>
 #include <QTcpSocket>
-#include <sys/socket.h>
 #include <zgblpara.h>
 #include <QJsonObject>
 #include <QJsonDocument>
@@ -9,7 +8,10 @@
 #include <QJsonArray>
 #include <QDateTime>
 #include <QProcess>
-
+extern "C"
+{
+    #include <sys/socket.h>
+}
 ZJsonThread::ZJsonThread(QObject *parent):QThread(parent)
 {
     this->m_tcpSocket=NULL;

@@ -1,8 +1,11 @@
 #include "zaudioplaythread.h"
 #include "zgblpara.h"
-#include <sys/time.h>
 #include <QDebug>
 #include <QDateTime>
+extern "C"
+{
+    #include <sys/time.h>
+}
 ZAudioPlayThread::ZAudioPlayThread(QString playCardName)
 {
     this->m_playCardName=playCardName;
@@ -51,7 +54,8 @@ void ZAudioPlayThread::run()
     /* PCM device will return immediately. If SND_PCM_ASYNC is    */
     /* specified, SIGIO will be emitted whenever a period has     */
     /* been completely processed by the soundcard.                */
-    if((nRet=snd_pcm_open(&this->m_pcmHandle,this->m_playCardName.toLatin1().data(),SND_PCM_STREAM_PLAYBACK,0))<0)
+    nRet=snd_pcm_open(&this->m_pcmHandle,this->m_playCardName.toLatin1().constData(),SND_PCM_STREAM_PLAYBACK,0);
+    if(nRet<0)
     {
         qCritical()<<"AudioPlay,error at snd_pcm_open():"<<this->m_playCardName<<snd_strerror(nRet);
         //set global request to exit flag to cause other threads to exit.
@@ -265,6 +269,7 @@ void ZAudioPlayThread::run()
 
     /* Stop PCM device after pending frames have been played */
     //snd_pcm_drain(pcmHandle);
+    snd_pcm_close(this->m_pcmHandle);
 
     qInfo()<<"AudioPlay,main loop ends.";
     //set global request to exit flag to help other thread to exit.

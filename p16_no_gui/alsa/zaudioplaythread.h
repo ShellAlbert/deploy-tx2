@@ -6,10 +6,17 @@
 #include <QQueue>
 #include <QSemaphore>
 #include <QWaitCondition>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <alsa/asoundlib.h>
+
+/* Use the newer ALSA API */
+extern "C"
+{
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+
+    #define ALSA_PCM_NEW_HW_PARAMS_API
+    #include <alsa/asoundlib.h>
+}
 class ZAudioPlayThread : public QThread
 {
     Q_OBJECT

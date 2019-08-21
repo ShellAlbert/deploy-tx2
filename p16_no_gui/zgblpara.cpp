@@ -1,9 +1,12 @@
 #include "zgblpara.h"
 #include <QDebug>
 #include <QSettings>
-#include <unistd.h>
-#include <stdio.h>
 #include <QFile>
+extern "C"
+{
+    #include <unistd.h>
+    #include <stdio.h>
+}
 ZAudioParam::ZAudioParam()
 {
 

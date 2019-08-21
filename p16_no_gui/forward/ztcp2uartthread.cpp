@@ -1,9 +1,12 @@
 #include "ztcp2uartthread.h"
 #include <QTcpServer>
 #include <QTcpSocket>
-#include <sys/socket.h>
 #include <zgblpara.h>
 #include <QtSerialPort/QSerialPort>
+extern "C"
+{
+    #include <sys/socket.h>
+}
 ZTcp2UartForwardThread::ZTcp2UartForwardThread()
 {
     this->m_bCleanup=false;

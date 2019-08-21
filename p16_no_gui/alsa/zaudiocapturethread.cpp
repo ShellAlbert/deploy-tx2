@@ -1,11 +1,16 @@
 #include "zaudiocapturethread.h"
 #include "zgblpara.h"
 #include <QDebug>
-#include <unistd.h>
-#include <sys/time.h>
 #include <QFile>
 #include <QCoreApplication>
 #include <QDateTime>
+
+extern "C"
+{
+    #include <unistd.h>
+    #include <sys/time.h>
+}
+
 ZAudioCaptureThread::ZAudioCaptureThread(QString capDevName,bool bDump2WavFile)
 {
     this->m_capDevName=capDevName;
@@ -69,7 +74,8 @@ void ZAudioCaptureThread::run()
     /* PCM device will return immediately. If SND_PCM_ASYNC is    */
     /* specified, SIGIO will be emitted whenever a period has     */
     /* been completely processed by the soundcard.                */
-    if((nRet=snd_pcm_open(&pcmHandle,this->m_capDevName.toLatin1().data(),SND_PCM_STREAM_CAPTURE,0))<0)
+    nRet=snd_pcm_open(&pcmHandle,this->m_capDevName.toLatin1().constData(),SND_PCM_STREAM_CAPTURE,0);
+    if(nRet<0)
     {
         qCritical()<<"AudioCapture,failed to open pcm device "<<this->m_capDevName<<","<<snd_strerror(nRet);
         //set global request to exit flag to cause other threads to exit.

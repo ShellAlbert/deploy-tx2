@@ -4,12 +4,17 @@
 #include <QThread>
 #include <QTimer>
 #include <QWaitCondition>
-/* Use the newer ALSA API */
-#include <stdio.h>
-#define ALSA_PCM_NEW_HW_PARAMS_API
-#include <alsa/asoundlib.h>
 #include <QSemaphore>
 #include <QQueue>
+
+/* Use the newer ALSA API */
+extern "C"
+{
+    #include <stdio.h>
+    #define ALSA_PCM_NEW_HW_PARAMS_API
+    #include <alsa/asoundlib.h>
+}
+
 
 #define RSIZE    64    //buf的大小
 
