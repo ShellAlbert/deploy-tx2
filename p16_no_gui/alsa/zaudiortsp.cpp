@@ -28,7 +28,7 @@ void ZAudioRtsp::run()
     Ipv4Address ipAddr("0.0.0.0", 8554);
     RtspServer* server = RtspServer::createNew(env, ipAddr);
     MediaSession* session = MediaSession::createNew("live");
-    MediaSource* audioSource = AlsaMediaSource::createNew(env, "hw:2,0"); //默认设备"hw:0,0"
+    MediaSource* audioSource = AlsaMediaSource::createNew(env,"hw:2,0"); //默认设备"hw:0,0"
     RtpSink* audioRtpSink = AACRtpSink::createNew(env, audioSource);
 
     session->addRtpSink(MediaSession::TrackId0, audioRtpSink);

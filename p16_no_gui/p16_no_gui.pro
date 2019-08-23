@@ -191,7 +191,7 @@ INCLUDEPATH += /usr/lib/aarch64-linux-gnu/glib-2.0/include
 #alsa & opus.
 LIBS += -lasound -lopus
 #noise suppression.
-#LIBS += -L$$PWD/../libns -lwebrtc -lrnnoise -lns
+LIBS += -L$$PWD/../libns -lwebrtc -lrnnoise -lns
 #gstreamer.
 #LIBS += -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0 -pthread
 

@@ -5,7 +5,7 @@
 #include "../libns/libns.h"
 
 //use following empty code to bypass libns.
-#if 1
+#if 0
 int ns_init(int mode)
 {
     return 0;
@@ -168,7 +168,7 @@ void ZNoiseCutThread::run()
     WebRtcSpl_ResetResample16khzTo48khz(&m_state1648);
 
     int frameSize=160;//80;
-    int len=frameSize*sizeof(short);
+    //int len=frameSize*sizeof(short);
     this->m_pDataIn=(short*)malloc(frameSize*sizeof(short));
     this->m_pDataOut=(short*)malloc(frameSize*sizeof(short));
 
@@ -339,13 +339,13 @@ void ZNoiseCutThread::run()
             break;
         case 2:
             //qDebug()<<"DeNoise:WebRTC Enabled";
-            if(gGblPara.m_audio.m_bWebRtcInitFlag)
-            {
-                ns_uninit();
-                char customBandGains[8]={0};
-                ns_custom_init(6,gGblPara.m_audio.m_nDenoiseGrade,0,0,customBandGains,0);
-                gGblPara.m_audio.m_bWebRtcInitFlag=false;
-            }
+//            if(gGblPara.m_audio.m_bWebRtcInitFlag)
+//            {
+//                ns_uninit();
+//                char customBandGains[8]={0};
+//                ns_custom_init(6,gGblPara.m_audio.m_nDenoiseGrade,0,0,customBandGains,0);
+//                gGblPara.m_audio.m_bWebRtcInitFlag=false;
+//            }
             this->ZCutNoiseByWebRTC(pcmIn);
             break;
         case 3:

@@ -8,12 +8,19 @@
 
 #include "rtsp/net/MediaSource.h"
 
+
+#include <QQueue>
+#include <QByteArray>
+#include <QMutex>
+#include <QWaitCondition>
 class AlsaMediaSource : public MediaSource
 {
 public:
     static AlsaMediaSource* createNew(UsageEnvironment* env, std::string dev);
     virtual ~AlsaMediaSource();
 
+    void ZBindInFIFO(QQueue<QByteArray*> *freeQueue,QQueue<QByteArray*> *usedQueue,///<
+                   QMutex *mutex,QWaitCondition *condQueueEmpty,QWaitCondition *condQueueFull);
 protected:
     AlsaMediaSource(UsageEnvironment* env, std::string& dev);
     virtual void readFrame();
@@ -38,6 +45,15 @@ private:
     uint8_t* mPcmBuffer;
 	uint8_t* mAACBuffer;
     uint32_t mMaxOutputBytes;
+
+private:
+    //in fifo.(noise cut -> rtsp tx)
+    QQueue<QByteArray*> *m_freeQueueIn;
+    QQueue<QByteArray*> *m_usedQueueIn;
+
+    QMutex *m_mutexIn;
+    QWaitCondition *m_condQueueEmptyIn;
+    QWaitCondition *m_condQueueFullIn;
 };
 
 #endif //_ALSA_MEDIA_SOURCE_H_

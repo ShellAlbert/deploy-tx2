@@ -1,5 +1,5 @@
-#include <assert.h>
 
+#include <assert.h>
 #include "rtsp/extend/alsa/AlsaMediaSource.h"
 #include "rtsp/base/Logging.h"
 
@@ -65,7 +65,7 @@ void AlsaMediaSource::readFrame()
         }
 
         ret = faacEncEncode(mFaacEncHandle, (int*)mPcmBuffer, mFrames*mPcmChannels,
-                                mAACBuffer, mMaxOutputBytes);
+                            mAACBuffer, mMaxOutputBytes);
     }
 
     memcpy(frame->mBuffer, mAACBuffer, ret);
@@ -83,8 +83,8 @@ bool AlsaMediaSource::alsaInit()
     int dir;
     snd_pcm_uframes_t frames;
 
-	/* 打开设备的捕获功能 */
-	ret = snd_pcm_open(&mPcmHandle, mDev.c_str(), SND_PCM_STREAM_CAPTURE, 0);
+    /* 打开设备的捕获功能 */
+    ret = snd_pcm_open(&mPcmHandle, mDev.c_str(), SND_PCM_STREAM_CAPTURE, 0);
     if(ret < 0)
     {
         LOG_ERROR("failed to open snd dev\n");
@@ -101,7 +101,7 @@ bool AlsaMediaSource::alsaInit()
     snd_pcm_hw_params_set_access(mPcmHandle, mPcmParams, SND_PCM_ACCESS_RW_INTERLEAVED);
 
     /* 设置采样为：有符号，16为，小端 */
-	snd_pcm_hw_params_set_format(mPcmHandle, mPcmParams, SND_PCM_FORMAT_S16_LE);
+    snd_pcm_hw_params_set_format(mPcmHandle, mPcmParams, SND_PCM_FORMAT_S16_LE);
 
     /* 设置通道数 */
     snd_pcm_hw_params_set_channels(mPcmHandle, mPcmParams, mPcmChannels);
@@ -110,17 +110,17 @@ bool AlsaMediaSource::alsaInit()
     val = mSampleRate;
     snd_pcm_hw_params_set_rate_near(mPcmHandle, mPcmParams, &val, &dir);
 
-	frames = mFrames;
-	snd_pcm_hw_params_set_period_size_near(mPcmHandle, mPcmParams, &frames, &dir);
+    frames = mFrames;
+    snd_pcm_hw_params_set_period_size_near(mPcmHandle, mPcmParams, &frames, &dir);
 
-	ret = snd_pcm_hw_params(mPcmHandle, mPcmParams);
-	if (ret < 0)
+    ret = snd_pcm_hw_params(mPcmHandle, mPcmParams);
+    if (ret < 0)
     {
-		LOG_ERROR("unable to set hw parameters: %s\n", snd_strerror(ret));
-		return false;
-	}
+        LOG_ERROR("unable to set hw parameters: %s\n", snd_strerror(ret));
+        return false;
+    }
 
-	snd_pcm_hw_params_get_period_size(mPcmParams, &frames, &dir);
+    snd_pcm_hw_params_get_period_size(mPcmParams, &frames, &dir);
     
     //mFrames = frames;
     mFrames = mFrames;
@@ -128,22 +128,22 @@ bool AlsaMediaSource::alsaInit()
 
     mPcmBuffer = new uint8_t[mFrameSize];
 
-	snd_pcm_hw_params_get_period_time(mPcmParams, &val, &dir);
+    snd_pcm_hw_params_get_period_time(mPcmParams, &val, &dir);
 
     return true;
 }
 
 void AlsaMediaSource::alsaExit()
 {
-	snd_pcm_drain(mPcmHandle);
-	snd_pcm_close(mPcmHandle);
+    snd_pcm_drain(mPcmHandle);
+    snd_pcm_close(mPcmHandle);
     delete[] mPcmBuffer;
 }
 
 bool AlsaMediaSource::faacInit()
 {
-	long unsigned int nInputSamples   = 0;
-	long unsigned int nMaxOutputBytes = 0;
+    long unsigned int nInputSamples   = 0;
+    long unsigned int nMaxOutputBytes = 0;
 
     mFaacEncHandle = faacEncOpen(mSampleRate, mPcmChannels, &nInputSamples, &nMaxOutputBytes);
     mFrames = nInputSamples/mPcmChannels;
@@ -161,12 +161,12 @@ bool AlsaMediaSource::faacInit()
     configuration->bandWidth = 64000;
 
     configuration->allowMidside = 1;
-	configuration->useLfe = 0;
-	configuration->useTns = 0;
+    configuration->useLfe = 0;
+    configuration->useTns = 0;
 
     configuration->quantqual = 100;
-	configuration->outputFormat = 1; //加上adts
-	configuration->shortctl = SHORTCTL_NORMAL;  
+    configuration->outputFormat = 1; //加上adts
+    configuration->shortctl = SHORTCTL_NORMAL;
     
     faacEncSetConfiguration(mFaacEncHandle, configuration);
 
@@ -177,4 +177,14 @@ void AlsaMediaSource::faacExit()
 {
     faacEncClose(mFaacEncHandle);
     delete[] mAACBuffer;
+}
+
+void AlsaMediaSource::ZBindInFIFO(QQueue<QByteArray*> *freeQueue,QQueue<QByteArray*> *usedQueue,///<
+                                    QMutex *mutex,QWaitCondition *condQueueEmpty,QWaitCondition *condQueueFull)
+{
+    this->m_freeQueueIn=freeQueue;
+    this->m_usedQueueIn=usedQueue;
+    this->m_mutexIn=mutex;
+    this->m_condQueueEmptyIn=condQueueEmpty;
+    this->m_condQueueFullIn=condQueueFull;
 }
