@@ -72,6 +72,7 @@ costMs:算法实际消耗的时间(毫秒)
  */
 
 #include "alsa/zaudiotask.h"
+#include "alsa/zaudiortsp.h"
 #include "forward/ztcp2uartthread.h"
 #include "json/zjsonthread.h"
 #include "ui/zmainui.h"
@@ -199,12 +200,15 @@ int main(int argc, char *argv[])
 
 
     //1.audio thread: capture -> noise suppression -> tx & play.
-    ZAudioTask *audio=new ZAudioTask;
-    if(audio->ZStartTask()<0)
-    {
-        qCritical()<<"failed to start audio task!";
-        return -1;
-    }
+//    ZAudioTask *audio=new ZAudioTask;
+//    if(audio->ZStartTask()<0)
+//    {
+//        qCritical()<<"failed to start audio task!";
+//        return -1;
+//    }
+     ZAudioRtsp *audio=new ZAudioRtsp;
+     audio->start();
+
 
     //2.tcp to uart forward thread.
     ZTcp2UartForwardThread *tcp2uart=new ZTcp2UartForwardThread;
@@ -230,7 +234,8 @@ int main(int argc, char *argv[])
         return -1;
     }
     //6.manage threads.
-    ui->ZManageThreads(audio,tcp2uart,json,NULL);
+    //ui->ZManageThreads(audio,tcp2uart,json,NULL);
+    ui->ZManageThreads(NULL,tcp2uart,json,NULL);
     ui->showMaximized();
 
 

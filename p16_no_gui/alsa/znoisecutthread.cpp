@@ -3,6 +3,37 @@
 #include <QDebug>
 #include <QFile>
 #include "../libns/libns.h"
+
+//use following empty code to bypass libns.
+#if 1
+int ns_init(int mode)
+{
+    return 0;
+}
+
+int ns_custom_init(int denoiseAlgorithm,
+                   int denoiseLevel,
+                   int enhancedType,
+                   int enhancedLevel,
+                   char* customBandGains,
+                   char preEmphasisFlag)
+{
+    return 0;
+}
+
+
+
+int ns_processing(char *pPcmAudio,const int nPcmLength)
+{
+    return 0;
+}
+
+int ns_uninit(void)
+{
+    return 0;
+}
+#endif
+
 #define FRAME_SIZE_SHIFT 2
 #define FRAME_SIZE (120<<FRAME_SIZE_SHIFT)
 
@@ -308,13 +339,13 @@ void ZNoiseCutThread::run()
             break;
         case 2:
             //qDebug()<<"DeNoise:WebRTC Enabled";
-        if(gGblPara.m_audio.m_bWebRtcInitFlag)
-        {
-            ns_uninit();
-            char customBandGains[8]={0};
-            ns_custom_init(6,gGblPara.m_audio.m_nDenoiseGrade,0,0,customBandGains,0);
-            gGblPara.m_audio.m_bWebRtcInitFlag=false;
-        }
+            if(gGblPara.m_audio.m_bWebRtcInitFlag)
+            {
+                ns_uninit();
+                char customBandGains[8]={0};
+                ns_custom_init(6,gGblPara.m_audio.m_nDenoiseGrade,0,0,customBandGains,0);
+                gGblPara.m_audio.m_bWebRtcInitFlag=false;
+            }
             this->ZCutNoiseByWebRTC(pcmIn);
             break;
         case 3:
@@ -331,13 +362,13 @@ void ZNoiseCutThread::run()
             {
                 ns_uninit();
                 qint8 customBandGains[8]={gGblPara.m_audio.m_nBandGain0,///<
-                                         gGblPara.m_audio.m_nBandGain1,///<
-                                         gGblPara.m_audio.m_nBandGain2,///<
-                                         gGblPara.m_audio.m_nBandGain3,///<
-                                         gGblPara.m_audio.m_nBandGain4,///<
-                                         gGblPara.m_audio.m_nBandGain5,///<
-                                         gGblPara.m_audio.m_nBandGain6,///<
-                                         gGblPara.m_audio.m_nBandGain7};
+                                          gGblPara.m_audio.m_nBandGain1,///<
+                                          gGblPara.m_audio.m_nBandGain2,///<
+                                          gGblPara.m_audio.m_nBandGain3,///<
+                                          gGblPara.m_audio.m_nBandGain4,///<
+                                          gGblPara.m_audio.m_nBandGain5,///<
+                                          gGblPara.m_audio.m_nBandGain6,///<
+                                          gGblPara.m_audio.m_nBandGain7};
                 ns_custom_init(3,gGblPara.m_audio.m_nDenoiseGrade,gGblPara.m_audio.m_nEnhanceStyle,///<
                                gGblPara.m_audio.m_nEnhanceGrade,(char*)customBandGains,gGblPara.m_audio.m_bPreEnhance?1:0);
                 gGblPara.m_audio.m_bNsProfessionalFlag=false;

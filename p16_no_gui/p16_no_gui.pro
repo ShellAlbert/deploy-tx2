@@ -69,6 +69,41 @@ SOURCES += main.cpp \
     #ui/zimgdispui.cpp \
     ui/zmainui.cpp \
     #imgproc/zvideotask.cpp \
+    alsa/zaudiortsp.cpp \
+    rtsp/base/AsyncLogging.cpp \
+    rtsp/base/Condition.cpp \
+    rtsp/base/Logging.cpp \
+    rtsp/base/Mutex.cpp \
+    rtsp/base/Sem.cpp \
+    rtsp/base/Thread.cpp \
+    rtsp/base/ThreadPool.cpp \
+    rtsp/extend/alsa/AlsaMediaSource.cpp \
+    rtsp/extend/v4l2/V4l2.cpp \
+    rtsp/extend/v4l2/V4l2MediaSource.cpp \
+    rtsp/net/poller/EPollPoller.cpp \
+    rtsp/net/poller/Poller.cpp \
+    rtsp/net/poller/PollPoller.cpp \
+    rtsp/net/poller/SelectPoller.cpp \
+    rtsp/net/AACFileMediaSource.cpp \
+    rtsp/net/AACRtpSink.cpp \
+    rtsp/net/Acceptor.cpp \
+    rtsp/net/Buffer.cpp \
+    rtsp/net/Event.cpp \
+    rtsp/net/EventScheduler.cpp \
+    rtsp/net/H264FileMediaSource.cpp \
+    rtsp/net/H264RtpSink.cpp \
+    rtsp/net/InetAddress.cpp \
+    rtsp/net/MediaSession.cpp \
+    rtsp/net/MediaSource.cpp \
+    rtsp/net/RtpSink.cpp \
+    rtsp/net/RtspConnection.cpp \
+    rtsp/net/RtspServer.cpp \
+    rtsp/net/SocketsOps.cpp \
+    rtsp/net/TcpConnection.cpp \
+    rtsp/net/TcpServer.cpp \
+    rtsp/net/TcpSocket.cpp \
+    rtsp/net/Timer.cpp \
+    rtsp/net/UsageEnvironment.cpp
 
 HEADERS += \
     webrtc/analog_agc.h \
@@ -103,6 +138,43 @@ HEADERS += \
     #ui/zimgdispui.h \
     ui/zmainui.h \
     #imgproc/zvideotask.h \
+    alsa/zaudiortsp.h \
+    rtsp/base/AsyncLogging.h \
+    rtsp/base/Condition.h \
+    rtsp/base/Logging.h \
+    rtsp/base/Mutex.h \
+    rtsp/base/Sem.h \
+    rtsp/base/Thread.h \
+    rtsp/base/ThreadPool.h \
+    rtsp/extend/alsa/AlsaMediaSource.h \
+    rtsp/extend/v4l2/V4l2.h \
+    rtsp/extend/v4l2/V4l2MediaSource.h \
+    rtsp/net/poller/EPollPoller.h \
+    rtsp/net/poller/Poller.h \
+    rtsp/net/poller/PollPoller.h \
+    rtsp/net/poller/SelectPoller.h \
+    rtsp/net/AACFileMediaSource.h \
+    rtsp/net/AACRtpSink.h \
+    rtsp/net/Acceptor.h \
+    rtsp/net/Buffer.h \
+    rtsp/net/Event.h \
+    rtsp/net/EventScheduler.h \
+    rtsp/net/H264FileMediaSource.h \
+    rtsp/net/H264RtpSink.h \
+    rtsp/net/InetAddress.h \
+    rtsp/net/MediaSession.h \
+    rtsp/net/MediaSource.h \
+    rtsp/net/Rtp.h \
+    rtsp/net/RtpInstance.h \
+    rtsp/net/RtpSink.h \
+    rtsp/net/RtspConnection.h \
+    rtsp/net/RtspServer.h \
+    rtsp/net/SocketsOps.h \
+    rtsp/net/TcpConnection.h \
+    rtsp/net/TcpServer.h \
+    rtsp/net/TcpSocket.h \
+    rtsp/net/Timer.h \
+    rtsp/net/UsageEnvironment.h
 
 INCLUDEPATH += /usr/include/gstreamer-1.0
 INCLUDEPATH += /usr/include/glib-2.0
@@ -119,9 +191,13 @@ INCLUDEPATH += /usr/lib/aarch64-linux-gnu/glib-2.0/include
 #alsa & opus.
 LIBS += -lasound -lopus
 #noise suppression.
-LIBS += -L$$PWD/../libns -lwebrtc -lrnnoise -lns
+#LIBS += -L$$PWD/../libns -lwebrtc -lrnnoise -lns
 #gstreamer.
 #LIBS += -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0 -pthread
+
+#rtsp.
+LIBS += -lfaac -lx264
+
 #openCV.
 LIBS += -lopencv_dnn -lopencv_ml -lopencv_objdetect -lopencv_shape -lopencv_stitching -lopencv_superres -lopencv_videostab -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_video -lopencv_photo -lopencv_imgproc -lopencv_flann -lopencv_core
 
