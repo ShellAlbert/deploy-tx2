@@ -48,18 +48,18 @@ function addLog2File()
 	return 0
 }
 
+#make sure we run this with root priority.
+if [ `whoami` != "root" ];then
+	echo "<error>: latch me with root priority please."
+	exit -1
+fi
+
 #only allow one instance to run.
 PID=`cat /tmp/monitor.pid`
 kill -0 $PID
 if [ $? -eq 0 ];then
       echo "only allow one instance to run,so I quit."
       exit 0
-fi
-
-#make sure we run this with root priority.
-if [ `whoami` != "root" ];then
-	echo "<error>: latch me with root priority please."
-	exit -1
 fi
 
 cd $BASEDIR
@@ -113,7 +113,7 @@ do
     if [ $bStartCamBridge -eq 1 ];then
 	    addLog2File "/tmp/zcambridge.pid detected failed,launch it again."
 	    sleep 5
-	    ./zcambridge.bin "v4l2src device=/dev/video0 ! video/x-raw,width=(int)640,height=(int)480,framerate=(fraction)30/1 ! queue ! nvvidconv ! omxh264enc ! rtph264pay name=pay0 pt=96" &
+	    ./zcambridge.bin "v4l2src device=/dev/video0 ! video/x-raw,width=(int)640,height=(int)480,framerate=(fraction)30/1 ! queue ! nvvidconv ! omxh264enc ! rtph264pay name=pay0 pt=96 config-interval=1" &
     fi
 
     #check the p16(audio/json/uart) server.
@@ -122,7 +122,7 @@ do
         PID=`cat /tmp/p16.pid`
         sudo kill -0 $PID
         if [ $? -eq 0 ];then
-            echo "<okay>:p16 pid detect okay."
+            echo "<okay>:LizardTx2 pid detect okay."
         else
 	    kill -9 `cat /tmp/p16.pid`
 	    bStartP16=1
