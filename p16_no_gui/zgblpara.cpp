@@ -53,6 +53,10 @@ ZAudioParam::ZAudioParam()
     this->m_nDenoiseGrade=0;
     this->m_bPreEnhance=false;
     this->m_bNsProfessionalFlag=false;
+
+    //USB Audio Capture/Playback device.
+    //the default speaker playback volume.
+    this->m_nSpeakerPlaybackVolume=10;
 }
 ZGblPara::ZGblPara()
 {
@@ -95,6 +99,10 @@ void ZGblPara::readCfgFile()
     gGblPara.m_nCutBoxWidth=iniFile.value("width",0).toInt();
     gGblPara.m_nCutBoxHeight=iniFile.value("height",0).toInt();
     iniFile.endGroup();
+
+    iniFile.beginGroup("SpeakerPlaybackVolume");
+    gGblPara.m_audio.m_nSpeakerPlaybackVolume=iniFile.value("vol",10).toInt();
+    iniFile.endGroup();
 }
 void ZGblPara::writeCfgFile()
 {
@@ -120,6 +128,9 @@ void ZGblPara::writeCfgFile()
     iniFile.setValue("height",gGblPara.m_nCutBoxHeight);
     iniFile.endGroup();
 
+    iniFile.beginGroup("SpeakerPlaybackVolume");
+    iniFile.setValue("vol",gGblPara.m_audio.m_nSpeakerPlaybackVolume);
+    iniFile.endGroup();
 }
 void ZGblPara::initCfgFile()
 {
@@ -134,6 +145,8 @@ void ZGblPara::initCfgFile()
 
     gGblPara.m_nCutBoxWidth=200;
     gGblPara.m_nCutBoxHeight=200;
+
+    gGblPara.m_audio.m_nSpeakerPlaybackVolume=10;
 
     this->writeCfgFile();
 }

@@ -48,6 +48,14 @@ function addLog2File()
 	return 0
 }
 
+#only allow one instance to run.
+PID=`cat /tmp/monitor.pid`
+kill -0 $PID
+if [ $? -eq 0 ];then
+      echo "only allow one instance to run,so I quit."
+      exit 0
+fi
+
 #make sure we run this with root priority.
 if [ `whoami` != "root" ];then
 	echo "<error>: latch me with root priority please."
@@ -64,7 +72,7 @@ fi
 #elevate privilege.
 if [ -e "/dev/ttyTHS2" ];then
 	addLog2File "elevate privilege /dev/ttyTHS2."
-	sudo chmod 777 /dev/ttyTHS2
+	chmod 777 /dev/ttyTHS2
 fi
 
 #dump myself pid to file.
@@ -92,11 +100,11 @@ do
     bStartCamBridge=0
     if [ -f "/tmp/zcambridge.pid" ];then
         PID=`cat /tmp/zcambridge.pid`
-        sudo kill -0 $PID
+        kill -0 $PID
         if [ $? -eq 0 ];then
             echo "<okay>:cambridge pid detect okay."
         else
-	    sudo kill -9 `cat /tmp/zcambridge.pid`
+	    kill -9 `cat /tmp/zcambridge.pid`
 	    bStartCamBridge=1
         fi
     else
@@ -104,8 +112,8 @@ do
     fi
     if [ $bStartCamBridge -eq 1 ];then
 	    addLog2File "/tmp/zcambridge.pid detected failed,launch it again."
-	    sleep 3
-	    sudo ./zcambridge.bin "v4l2src device=/dev/video0 ! video/x-raw,width=(int)640,height=(int)480,framerate=(fraction)30/1 ! queue ! nvvidconv ! omxh264enc ! rtph264pay name=pay0 pt=96" &
+	    sleep 5
+	    ./zcambridge.bin "v4l2src device=/dev/video0 ! video/x-raw,width=(int)640,height=(int)480,framerate=(fraction)30/1 ! queue ! nvvidconv ! omxh264enc ! rtph264pay name=pay0 pt=96" &
     fi
 
     #check the p16(audio/json/uart) server.
@@ -114,9 +122,9 @@ do
         PID=`cat /tmp/p16.pid`
         sudo kill -0 $PID
         if [ $? -eq 0 ];then
-            echo "<okay>:LizardTx2 pid detect okay."
+            echo "<okay>:p16 pid detect okay."
         else
-	    sudo kill -9 `cat /tmp/p16.pid`
+	    kill -9 `cat /tmp/p16.pid`
 	    bStartP16=1
         fi
     else
@@ -124,8 +132,8 @@ do
     fi
     if [ $bStartP16 -eq 1 ];then
 	    addLog2File "/tmp/p16.pid detected failed,launch it again."
-	    sleep 3
-	    sudo ./p16.bin &
+	    sleep 5
+	    ./p16_no_gui.bin &
     fi
 
     #check periodly every 10 seconds.

@@ -609,7 +609,36 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                 qDebug()<<"JsonServer NRAEPara has error!";
             }
         }
-
+        if(jsonObj.contains("SpkPlaybackVol"))
+        {
+            QJsonValue val=jsonObj.take("SpkPlaybackVol");
+            if(val.isString())
+            {
+                QString strVolume=val.toVariant().toString();
+                if(strVolume=="query")
+                {
+                    //we should return current value whenever the request json cmd is right or not.
+                }else{
+                    gGblPara.m_audio.m_nSpeakerPlaybackVolume=strVolume.toInt();
+                    if(gGblPara.m_audio.m_nSpeakerPlaybackVolume >=0 && gGblPara.m_audio.m_nSpeakerPlaybackVolume<=30)
+                    {
+                        //system("amixer -c 1 cset numid=6,iface=MIXER,name='Speaker Playback Volume' 10");
+                        QStringList argList;
+                        argList<<"-c";
+                        argList<<"1";
+                        argList<<"cset";
+                        argList<<"numid=6,iface=MIXER,name='Speaker Playback Volume'";
+                        argList<<strVolume;
+                        QProcess process;
+                        process.start("/usr/bin/amixer",argList);
+                        process.waitForFinished();
+                    }else{
+                        qWarning()<<"JsonServer invalid SpeakerPlaybackVolume:"<<strVolume<<",only [0~30] allowed.";
+                    }
+                }
+            }
+            jsonObjFeedBack.insert("SpkPlaybackVol",gGblPara.m_audio.m_nSpeakerPlaybackVolume);
+        }
         if(bWrCfgFileFlag)
         {
             gGblPara.writeCfgFile();

@@ -85,15 +85,16 @@ costMs:算法实际消耗的时间(毫秒)
 #include <QFile>
 #include <QDebug>
 #include <QMutex>
+#include <QProcess>
 
 extern "C"
 {
-    #include <signal.h>
-    #include <pthread.h>
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <errno.h>
-    #include <unistd.h>
+#include <signal.h>
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <unistd.h>
 }
 void gSIGHandler(int sigNo)
 {
@@ -149,6 +150,7 @@ void gCustomMessageHandler(QtMsgType type,const QMessageLogContext &context, con
     }
 }
 
+
 int main(int argc, char *argv[])
 {
     int ret;
@@ -174,6 +176,27 @@ int main(int argc, char *argv[])
         gGblPara.initCfgFile();
     }
     gGblPara.readCfgFile();
+
+    //initial USBPlaybackVolume to previous setting value.
+    qint32 nVolume=gGblPara.m_audio.m_nSpeakerPlaybackVolume;
+    if(nVolume>=0 && nVolume<=30)
+    {
+        qDebug()<<"init SpeakerPlaybackVolume to "<<nVolume;
+    }else{
+        qWarning()<<"SpeakerPlaybackVolume"<<nVolume<<"not in valid range[0~30],reset to 10.";
+        nVolume=10;
+    }
+    //system("amixer -c 1 cset numid=6,iface=MIXER,name='Speaker Playback Volume' 10");
+    QStringList argList;
+    argList<<"-c";
+    argList<<"1";
+    argList<<"cset";
+    argList<<"numid=6,iface=MIXER,name='Speaker Playback Volume'";
+    argList<<QString::number(nVolume);
+    QProcess process;
+    process.start("/usr/bin/amixer",argList);
+    process.waitForFinished();
+
 
     //1.audio thread: capture -> noise suppression -> tx & play.
     ZAudioTask *audio=new ZAudioTask;

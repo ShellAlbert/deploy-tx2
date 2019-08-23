@@ -154,6 +154,11 @@ public:
     qint32 m_nDenoiseGrade;
     bool m_bPreEnhance;
     bool m_bNsProfessionalFlag;
+
+
+    //USB Audio Capture/Playback device.
+    //the default speaker playback volume.
+    qint32 m_nSpeakerPlaybackVolume;
 };
 
 class ZGblPara
