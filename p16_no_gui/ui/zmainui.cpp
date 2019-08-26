@@ -1,5 +1,6 @@
 #include "zmainui.h"
 #include <QDebug>
+#include "alsa/zaudiortsp.h"
 #include "alsa/zaudiotask.h"
 #include "forward/ztcp2uartthread.h"
 #include "json/zjsonthread.h"
@@ -20,7 +21,7 @@ qint32 ZMainObj::ZDoInit()
 {
     return 0;
 }
-qint32 ZMainObj::ZManageThreads(ZAudioTask *audio,ZTcp2UartForwardThread *tcp2uart,ZJsonThread *json,ZVideoTask *video)
+qint32 ZMainObj::ZManageThreads(ZAudioRtsp *audio,ZTcp2UartForwardThread *tcp2uart,ZJsonThread *json,ZVideoTask *video)
 {
     this->m_audio=audio;
     this->m_tcp2uart=tcp2uart;

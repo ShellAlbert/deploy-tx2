@@ -14,7 +14,7 @@
 #include <QDebug>
 ZAudioRtsp::ZAudioRtsp()
 {
-
+    this->m_bCleanup=false;
 }
 void ZAudioRtsp::run()
 {
@@ -41,4 +41,10 @@ void ZAudioRtsp::run()
     qDebug()<<QString(server->getUrl(session).c_str());
     env->scheduler()->loop();
 
+    this->m_bCleanup=true;
+    return;
+}
+bool ZAudioRtsp::ZIsCleanup()
+{
+    return this->m_bCleanup;
 }

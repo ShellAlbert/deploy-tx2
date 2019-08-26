@@ -5,6 +5,7 @@
 #include <QTimer>
 #include "zgblpara.h"
 class ZAudioTask;
+class ZAudioRtsp;
 class ZTcp2UartForwardThread;
 class ZJsonThread;
 class ZVideoTask;
@@ -21,12 +22,13 @@ public:
     qint32 ZDoInit();
     qint32 ZDoClean();
 public:
-    qint32 ZManageThreads(ZAudioTask *audio,ZTcp2UartForwardThread *tcp2uart,ZJsonThread *json,ZVideoTask *video);
+    qint32 ZManageThreads(ZAudioRtsp *audio,ZTcp2UartForwardThread *tcp2uart,ZJsonThread *json,ZVideoTask *video);
 private slots:
     void ZSlotHelp2Exit();
 private:
     QTimer *m_timerExit;
-    ZAudioTask *m_audio;
+    //ZAudioTask *m_audio;
+    ZAudioRtsp *m_audio;
     ZTcp2UartForwardThread *m_tcp2uart;
     ZJsonThread *m_json;
     ZVideoTask *m_video;

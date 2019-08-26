@@ -37,7 +37,6 @@ private:
     void handleRead();
 
 private:
-    bool mQuit;
     Poller* mPoller;
     TimerManager* mTimerManager;
     std::vector<TriggerEvent*> mTriggerEvents;

@@ -8,10 +8,11 @@ class ZAudioRtsp : public QThread
 public:
     ZAudioRtsp();
 
+    bool ZIsCleanup();
 protected:
     void run();
-
 private:
+    bool m_bCleanup;
 };
 
 #endif // ZAUDIORTSP_H

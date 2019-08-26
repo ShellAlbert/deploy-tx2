@@ -8,6 +8,8 @@
 #include "rtsp/net/poller/EPollPoller.h"
 #include "rtsp/base/Logging.h"
 
+#include "zgblpara.h"
+
 static int createEventFd()
 {
     int evtFd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
@@ -32,10 +34,9 @@ EventScheduler* EventScheduler::createNew(PollerType type)
     return new EventScheduler(type, evtFd);
 }
 
-EventScheduler::EventScheduler(PollerType type, int fd) :
-    mQuit(false),
-    mWakeupFd(fd)
+EventScheduler::EventScheduler(PollerType type, int fd)
 {
+    this->mWakeupFd=fd;
     switch (type)
     {
     case POLLER_SELECT:
@@ -122,7 +123,8 @@ bool EventScheduler::removeIOEvent(IOEvent* event)
 
 void EventScheduler::loop()
 {
-    while(mQuit != true)
+    //while(mQuit != true)
+    while(!gGblPara.m_bGblRst2Exit)
     {
         this->handleTriggerEvents();
         mPoller->handleEvent();

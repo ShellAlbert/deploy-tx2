@@ -13,7 +13,7 @@ AlsaMediaSource::AlsaMediaSource(UsageEnvironment* env, std::string& dev) :
     mEnv(env),
     mDev(dev),
     mPcmChannels(2),
-    mSampleRate(48000),
+    mSampleRate(44100),
     mFrames(1024)
 {
     bool ret;
