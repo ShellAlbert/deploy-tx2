@@ -9,6 +9,10 @@
 #define FRAME_MAX_SIZE (1024*500)
 #define DEFAULT_FRAME_NUM 4
 
+
+#include <QWaitCondition>
+#include <QSemaphore>
+#include <QQueue>
 class AVFrame
 {
 public:
@@ -34,6 +38,9 @@ public:
     void putFrame(AVFrame* frame);
     int getFps() const { return mFps; }
 
+
+    void ZBindFIFO(QQueue<QByteArray*> *freeQueue,QQueue<QByteArray*> *usedQueue,///<
+                   QMutex *mutex,QWaitCondition *condQueueEmpty,QWaitCondition *condQueueFull);
 protected:
     MediaSource(UsageEnvironment* env);
     virtual void readFrame() = 0;
@@ -50,6 +57,14 @@ protected:
     Mutex* mMutex;
     ThreadPool::Task mTask;
     int mFps;
+
+private:
+    QQueue<QByteArray*> *m_freeQueue;
+    QQueue<QByteArray*> *m_usedQueue;
+
+    QMutex *m_mutex;
+    QWaitCondition *m_condQueueEmpty;
+    QWaitCondition *m_condQueueFull;
 };
 
 #endif //_MEDIA_SOURCE_H_

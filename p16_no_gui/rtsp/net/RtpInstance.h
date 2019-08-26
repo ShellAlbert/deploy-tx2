@@ -121,7 +121,7 @@ public:
     uint16_t getLocalPort() const { return mLocalPort; }
 
     int alive() const { return mIsAlive; }
-    int setAlive(bool alive) { mIsAlive = alive; };
+    int setAlive(bool alive) { mIsAlive=alive;}
     void setSessionId(uint16_t sessionId) { mSessionId = sessionId; }
     uint16_t sessionId() const { return mSessionId; }
 

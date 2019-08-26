@@ -46,3 +46,12 @@ void MediaSource::taskCallback(void* arg)
     MediaSource* source = (MediaSource*)arg;
     source->readFrame();
 }
+void MediaSource::ZBindFIFO(QQueue<QByteArray*> *freeQueue,QQueue<QByteArray*> *usedQueue,///<
+               QMutex *mutex,QWaitCondition *condQueueEmpty,QWaitCondition *condQueueFull)
+{
+    this->m_freeQueue=freeQueue;
+    this->m_usedQueue=usedQueue;
+    this->m_mutex=mutex;
+    this->m_condQueueEmpty=condQueueEmpty;
+    this->m_condQueueFull=condQueueFull;
+}
