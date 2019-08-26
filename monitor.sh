@@ -83,7 +83,7 @@ fi
 
 #clean pid files before running.
 #for manual debug.
-rm -rf /tmp/zcambridge.pid
+#rm -rf /tmp/zcambridge.pid
 rm -rf /tmp/p16.pid
 
 #dump my pid to file.
@@ -97,24 +97,24 @@ while true
 do
     #check the usb(yuv-h264 rtsp) video server.
     #the middle camera (big view).
-    bStartCamBridge=0
-    if [ -f "/tmp/zcambridge.pid" ];then
-        PID=`cat /tmp/zcambridge.pid`
-        kill -0 $PID
-        if [ $? -eq 0 ];then
-            echo "<okay>:cambridge pid detect okay."
-        else
-	    kill -9 `cat /tmp/zcambridge.pid`
-	    bStartCamBridge=1
-        fi
-    else
-	    bStartCamBridge=1
-    fi
-    if [ $bStartCamBridge -eq 1 ];then
-	    addLog2File "/tmp/zcambridge.pid detected failed,launch it again."
-	    sleep 5
-	    ./zcambridge.bin "v4l2src device=/dev/video0 ! video/x-raw,width=(int)640,height=(int)480,framerate=(fraction)30/1 ! queue ! nvvidconv ! omxh264enc ! rtph264pay name=pay0 pt=96 config-interval=1" &
-    fi
+#    bStartCamBridge=0
+#    if [ -f "/tmp/zcambridge.pid" ];then
+#        PID=`cat /tmp/zcambridge.pid`
+#        kill -0 $PID
+#        if [ $? -eq 0 ];then
+#            echo "<okay>:cambridge pid detect okay."
+#        else
+#	    kill -9 `cat /tmp/zcambridge.pid`
+#	    bStartCamBridge=1
+#        fi
+#    else
+#	    bStartCamBridge=1
+#    fi
+#    if [ $bStartCamBridge -eq 1 ];then
+#	    addLog2File "/tmp/zcambridge.pid detected failed,launch it again."
+#	    sleep 5
+#	    ./zcambridge.bin "v4l2src device=/dev/video0 ! video/x-raw,width=(int)640,height=(int)480,framerate=(fraction)30/1 ! queue ! nvvidconv ! omxh264enc ! rtph264pay name=pay0 pt=96 config-interval=1" &
+#    fi
 
     #check the p16(audio/json/uart) server.
     bStartP16=0

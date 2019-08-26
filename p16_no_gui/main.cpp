@@ -209,7 +209,6 @@ int main(int argc, char *argv[])
 //     ZAudioRtsp *audio=new ZAudioRtsp;
 //     audio->start();
 
-
     //2.tcp to uart forward thread.
     ZTcp2UartForwardThread *tcp2uart=new ZTcp2UartForwardThread;
     if(tcp2uart->ZStartThread()<0)
