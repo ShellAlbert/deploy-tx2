@@ -200,14 +200,14 @@ int main(int argc, char *argv[])
 
 
     //1.audio thread: capture -> noise suppression -> tx & play.
-//    ZAudioTask *audio=new ZAudioTask;
-//    if(audio->ZStartTask()<0)
-//    {
-//        qCritical()<<"failed to start audio task!";
-//        return -1;
-//    }
-     ZAudioRtsp *audio=new ZAudioRtsp;
-     audio->start();
+    ZAudioTask *audio=new ZAudioTask;
+    if(audio->ZStartTask()<0)
+    {
+        qCritical()<<"failed to start audio task!";
+        return -1;
+    }
+//     ZAudioRtsp *audio=new ZAudioRtsp;
+//     audio->start();
 
     //2.tcp to uart forward thread.
     ZTcp2UartForwardThread *tcp2uart=new ZTcp2UartForwardThread;

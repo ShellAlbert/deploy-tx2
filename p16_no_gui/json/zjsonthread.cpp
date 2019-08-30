@@ -323,12 +323,15 @@ QByteArray ZJsonThread::ZParseJson(const QJsonDocument &jsonDoc)
                 if(webRtcGrade=="0")
                 {
                     gGblPara.m_audio.m_nWebRtcNsPolicy=0;
+                    gGblPara.m_audio.m_bWebRtcInitFlag=true;
                 }else if(webRtcGrade=="1")
                 {
                     gGblPara.m_audio.m_nWebRtcNsPolicy=1;
+                    gGblPara.m_audio.m_bWebRtcInitFlag=true;
                 }else if(webRtcGrade=="2")
                 {
                     gGblPara.m_audio.m_nWebRtcNsPolicy=2;
+                    gGblPara.m_audio.m_bWebRtcInitFlag=true;
                 }else if(webRtcGrade=="query")
                 {
                     //仅用于查询当前状态.

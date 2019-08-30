@@ -21,7 +21,7 @@ qint32 ZMainObj::ZDoInit()
 {
     return 0;
 }
-qint32 ZMainObj::ZManageThreads(ZAudioRtsp *audio,ZTcp2UartForwardThread *tcp2uart,ZJsonThread *json,ZVideoTask *video)
+qint32 ZMainObj::ZManageThreads(ZAudioTask/*ZAudioRtsp*/ *audio,ZTcp2UartForwardThread *tcp2uart,ZJsonThread *json,ZVideoTask *video)
 {
     this->m_audio=audio;
     this->m_tcp2uart=tcp2uart;
