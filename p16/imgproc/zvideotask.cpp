@@ -18,7 +18,7 @@ qint32 ZVideoTask::ZStartTask(QWidget *mainUI)
     //rtsp1->queue->imgProc.
     for(qint32 i=0;i<FIFO_DEPTH;i++)
     {
-        this->m_rtsp2imgProc1[i]=new cv::Mat(1080,1920,CV_8UC1);
+        this->m_rtsp2imgProc1[i]=new cv::Mat(RTSP_H264_HEIGHT,RTSP_H264_WIDTH,CV_8UC1);
         this->m_rtsp2imgProcFree1.enqueue(this->m_rtsp2imgProc1[i]);
     }
     this->m_rtsp2imgProcUsed1.clear();
@@ -26,7 +26,7 @@ qint32 ZVideoTask::ZStartTask(QWidget *mainUI)
     //rtsp2->queue->imgProc.
     for(qint32 i=0;i<FIFO_DEPTH;i++)
     {
-        this->m_rtsp2imgProc2[i]=new cv::Mat(1080,1920,CV_8UC1);
+        this->m_rtsp2imgProc2[i]=new cv::Mat(RTSP_H264_HEIGHT,RTSP_H264_WIDTH,CV_8UC1);
         this->m_rtsp2imgProcFree2.enqueue(this->m_rtsp2imgProc2[i]);
     }
     this->m_rtsp2imgProcUsed2.clear();
@@ -35,12 +35,12 @@ qint32 ZVideoTask::ZStartTask(QWidget *mainUI)
     ZMainUI *mainUI2=qobject_cast<ZMainUI*>(mainUI);
 
     //left video.
-    this->m_rtsp1=new ZRtspThread("192.168.137.12");
+    this->m_rtsp1=new ZRtspThread("192.168.137.10");
     this->m_rtsp1->ZBindQueue(&this->m_rtsp2imgProcMux1,///<
                                  &this->m_condRtsp2imgProcNotEmpty1,&this->m_condRtsp2imgProcNotFull1,///<
                                  &this->m_rtsp2imgProcFree1,&this->m_rtsp2imgProcUsed1);
     //right video.
-    this->m_rtsp2=new ZRtspThread("192.168.137.20");
+    this->m_rtsp2=new ZRtspThread("192.168.137.12");
     this->m_rtsp2->ZBindQueue(&this->m_rtsp2imgProcMux2,///<
                                  &this->m_condRtsp2imgProcNotEmpty2,&this->m_condRtsp2imgProcNotFull2,///<
                                  &this->m_rtsp2imgProcFree2,&this->m_rtsp2imgProcUsed2);

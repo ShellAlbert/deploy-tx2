@@ -39,7 +39,8 @@ void ZRtspThread::run()
     {
         //1.open rtsp connection.
         //cv::VideoCapture cap(rtspAddr.toStdString(),cv::CAP_GSTREAMER);
-        cv::VideoCapture cap(rtspAddr.toStdString());
+        qDebug()<<"begin";
+        cv::VideoCapture cap(rtspAddr.toStdString(),cv::CAP_GSTREAMER);
         if(!cap.isOpened())
         {
             cap.release();
@@ -49,7 +50,7 @@ void ZRtspThread::run()
             this->sleep(3);
             continue;
         }
-        //qDebug()<<"open rtsp okay";
+        qDebug()<<"open rtsp okay";
         emit this->ZSigConnected();
 
         //2.loop to read image.
@@ -64,10 +65,10 @@ void ZRtspThread::run()
                 this->sleep(3);
                 break;
             }
-            //qDebug()<<this->m_rtspAddr<<"read img okay"<<mat.cols<<mat.rows<<mat.depth()<<mat.channels();
+            qDebug()<<this->m_rtspAddr<<"read img okay"<<mat.cols<<mat.rows<<mat.depth()<<mat.channels();
             //black-white:gray: so channels()=1.
             //RGB: channels()=3.
-            //qDebug()<<mat.cols<<mat.rows<<","<<mat.channels();
+            qDebug()<<mat.cols<<mat.rows<<","<<mat.channels();
 
             //4.add image to fifo.
             //4.1 fetch a free buffer in freeQueue.

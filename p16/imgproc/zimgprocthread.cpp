@@ -33,8 +33,8 @@ qint32 ZImgProcThread::ZBindQueue2(QMutex *mutex,///<
 
 void ZImgProcThread::run()
 {
-    cv::Mat *mat1=new cv::Mat(1080,1920,CV_8UC1);
-    cv::Mat *mat2=new cv::Mat(1080,1920,CV_8UC1);
+    cv::Mat *mat1=new cv::Mat(RTSP_H264_HEIGHT,RTSP_H264_WIDTH,CV_8UC1);
+    cv::Mat *mat2=new cv::Mat(RTSP_H264_HEIGHT,RTSP_H264_WIDTH,CV_8UC1);
     while(!gGblPara.m_bGblRst2Exit)
     {
 
@@ -79,6 +79,14 @@ void ZImgProcThread::run()
 
         //3.do image algorithm.
         //qDebug()<<"imgproc fetch 2 images okay.";
+
+
+        //draw rectangle on main image.
+        qint32 nMainImgRectX=gGblPara.m_calCenterX1-gGblPara.m_nCutBoxWidth/2;
+        qint32 nMainImgRectY=gGblPara.m_calCenterY1-gGblPara.m_nCutBoxHeight/2;
+        cv::Rect rectMainImgBox(nMainImgRectX,nMainImgRectY,gGblPara.m_nCutBoxWidth,gGblPara.m_nCutBoxHeight);
+        cv::rectangle(*mat1,rectMainImgBox,cv::Scalar(0,255,0,255),2);
+
 
         //convert cv::Mat to QImage.
         QImage img1=cvMat2QImage(*mat1);

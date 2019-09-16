@@ -3,9 +3,10 @@
 #include <QFontMetrics>
 #include <QDebug>
 #include <zgblpara.h>
-ZImgDispUI::ZImgDispUI(QString title,QWidget *parent) : QWidget(parent)
+ZImgDispUI::ZImgDispUI(QString title,bool bMainImg,QWidget *parent) :QWidget(parent)
 {
     this->m_title=title;
+    this->m_bMainImg=bMainImg;
 }
 ZImgDispUI::~ZImgDispUI()
 {
@@ -28,11 +29,11 @@ void ZImgDispUI::paintEvent(QPaintEvent *event)
         return;
     }
 
-    //1.draw image on widget.
+    //2.draw image on widget.
     QPainter painter(this);
     painter.drawImage(QRectF(0,0,this->width(),this->height()),this->m_img);
 
-    //2.draw informations on widget.
+    //3.draw informations on widget.
     QFont font=painter.font();
     font.setPixelSize(20);
     painter.setFont(font);

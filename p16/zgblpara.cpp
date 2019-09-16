@@ -88,7 +88,7 @@ void ZGblPara::readCfgFile()
     gGblPara.m_calCenterY3=iniFile.value("y3",0).toInt();
     iniFile.endGroup();
 
-    iniFile.beginGroup("CuteBox");
+    iniFile.beginGroup("CutBox");
     gGblPara.m_nCutBoxWidth=iniFile.value("width",0).toInt();
     gGblPara.m_nCutBoxHeight=iniFile.value("height",0).toInt();
     iniFile.endGroup();
@@ -112,7 +112,7 @@ void ZGblPara::writeCfgFile()
     iniFile.setValue("y3",gGblPara.m_calCenterY3);
     iniFile.endGroup();
 
-    iniFile.beginGroup("CuteBox");
+    iniFile.beginGroup("CutBox");
     iniFile.setValue("width",gGblPara.m_nCutBoxWidth);
     iniFile.setValue("height",gGblPara.m_nCutBoxHeight);
     iniFile.endGroup();

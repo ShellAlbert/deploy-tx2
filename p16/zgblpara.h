@@ -18,8 +18,9 @@
 //#define APP_VERSION "0.1.0" //2018/07/10.
 #define APP_VERSION "0.2.0" //2019/1/7.
 
-
-
+//720p.
+#define RTSP_H264_WIDTH 1280
+#define RTSP_H264_HEIGHT 720
 
 //port define.
 #define TCP_PORT_AUDIO  6801 //传输opus音频

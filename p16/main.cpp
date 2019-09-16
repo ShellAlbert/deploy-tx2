@@ -79,11 +79,7 @@ costMs:算法实际消耗的时间(毫秒)
 #include "rtsp/zrtspaudiocapture.h"
 #include "zgblpara.h"
 
-#ifdef BUILD_ZSY_GUI_SUPPORT
 #include <QApplication>
-#else
-#include <QCoreApplication>
-#endif
 #include <QDateTime>
 #include <QSettings>
 #include <QFile>
@@ -111,29 +107,51 @@ void gSIGHandler(int sigNo)
 }
 void gCustomMessageHandler(QtMsgType type,const QMessageLogContext &context, const QString &msg)
 {
+    Q_UNUSED(context);
+
+    QString msgType;
+    static QMutex mutex;
+    mutex.lock();
     switch(type)
     {
+    case QtInfoMsg:
+        msgType=QString("<INFO>");
+        break;
     case QtDebugMsg:
+        msgType=QString("<DEBUG>");
         break;
     case QtWarningMsg:
+        msgType=QString("<WARNING>");
         break;
     case QtCriticalMsg:
+        msgType=QString("<CRITICAL>");
         break;
     case QtFatalMsg:
+        msgType=QString("<FATAL>");
         break;
+    default:
+        break;
+    }
+    QString logMsg=QString("%1:%2:%3\r\n").arg(msgType).arg(QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss")).arg(msg);
+    QFile fileLog("p16.log");
+    fileLog.open(QIODevice::WriteOnly|QIODevice::Append);
+    fileLog.write(logMsg.toLatin1());
+    fileLog.close();
+    mutex.unlock();
+
+    if(type==QtFatalMsg)
+    {
+        abort();
     }
 }
 
 int main(int argc, char *argv[])
 {
     int ret;
-#ifdef BUILD_ZSY_GUI_SUPPORT
-    QApplication p16(argc, argv);
-#else
-    QCoreApplication p16(argc, argv);
-#endif
 
-    qInstallMessageHandler(gCustomMessageHandler);
+    QApplication p16(argc, argv);
+
+    //qInstallMessageHandler(gCustomMessageHandler);
 
     //    ZRtspAudioCapture *cap=new ZRtspAudioCapture;
     //    cap->start();
@@ -149,6 +167,7 @@ int main(int argc, char *argv[])
     gGblPara.readCfgFile();
 
     //1.audio thread: capture -> noise suppression -> tx & play.
+#if 0
     ZAudioTask *audio=new ZAudioTask;
     if(audio->ZStartTask()<0)
     {
@@ -171,9 +190,9 @@ int main(int argc, char *argv[])
         qDebug()<<"<error>:failed to start json thread!";
         return -1;
     }
+#endif
 
     //4.ui.
-#ifdef BUILD_ZSY_GUI_SUPPORT
     ZMainUI *ui=new ZMainUI;
     if(ui->ZDoInit()<0)
     {
@@ -189,24 +208,16 @@ int main(int argc, char *argv[])
     }
 
     //6.manage threads.
-    ui->ZManageThreads(audio,tcp2uart,json,video);
+    //ui->ZManageThreads(audio,tcp2uart,json,video);
+    ui->ZManageThreads(NULL,NULL,NULL,video);
     ui->showMaximized();
-#else
-    ZMainObj *ui=new ZMainObj;
-    if(ui->ZDoInit()<0)
-    {
-        qDebug()<<"<error>:failed to initial main window.";
-        return -1;
-    }
-    //6.manage threads.
-    ui->ZManageThreads(audio,tcp2uart,json,NULL);
-    ui->showMaximized();
-#endif
+
 
     //install signal handler.
     //Set the signal callback for Ctrl-C
     signal(SIGINT,gSIGHandler);
 
+#if 0
     //write pid to file.
     QFile filePID("/tmp/p16.pid");
     if(!filePID.open(QIODevice::WriteOnly))
@@ -220,27 +231,27 @@ int main(int argc, char *argv[])
     filePID.write(pidBuffer,strlen(pidBuffer));
     filePID.close();
     qDebug()<<"write pid to /tmp/p16.pid,"<<pidBuffer<<".";
+#endif
 
     //enter event loop until exit() was called.
     ret=p16.exec();
 
+#if 0
     //free resources.
     delete audio;
     audio=NULL;
-
-#ifdef BUILD_ZSY_GUI_SUPPORT
-    delete video;
-    video=NULL;
-#endif
 
     delete tcp2uart;
     tcp2uart=NULL;
 
     delete json;
     json=NULL;
-
+#endif
     delete ui;
     ui=NULL;
+
+    delete video;
+    video=NULL;
 
     qDebug()<<"<exit>:done.";
     return ret;
