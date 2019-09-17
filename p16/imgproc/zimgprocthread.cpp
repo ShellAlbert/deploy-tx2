@@ -1,5 +1,6 @@
 #include "zimgprocthread.h"
 #include "csk_tracker.h"
+#include "imgproc/KCF/kcftracker.hpp"
 #include <zgblpara.h>
 #include <string.h>
 #include <QDebug>
@@ -38,6 +39,10 @@ void ZImgProcThread::run()
     cv::Mat *mat1=new cv::Mat(RTSP_H264_HEIGHT,RTSP_H264_WIDTH,CV_8UC1);
     cv::Mat *mat2=new cv::Mat(RTSP_H264_HEIGHT,RTSP_H264_WIDTH,CV_8UC1);
 
+    //rectangle for main&aux img.
+    cv::Rect rectMain;
+    cv::Rect rectAux;
+
     //opencv Template Match algorithm initial code here.
 
     //opencv CSK Tracker algorithm initial code here.
@@ -46,6 +51,15 @@ void ZImgProcThread::run()
     cv::Point trackerPtCenter;
     cv::Size trackerTargetSize;
     bool bTrackerInitBox=false;
+
+    //openCV KCF tracker algorithm initial code here.
+    bool HOG = true;
+    bool FIXEDWINDOW = false;
+    bool MULTISCALE = true;
+    bool LAB = false;
+    // Create KCFTracker object
+    KCFTracker trackerKCF(HOG, FIXEDWINDOW, MULTISCALE, LAB);
+    bool bKCFTrackerInit=false;
 
     //the main loop.
     while(!gGblPara.m_bGblRst2Exit)
@@ -125,6 +139,7 @@ void ZImgProcThread::run()
 
             //cause to reinit tracker when algorithm changes.
             bTrackerInitBox=false;
+            bKCFTrackerInit=false;
         }
             break;
         case OPENCV_TEMPLATE_MATCH:
@@ -132,28 +147,28 @@ void ZImgProcThread::run()
             //we cut a (w*h) box image centered on calibrate center(x,y).
             qint32 nMainImgRectX=gGblPara.m_calCenterX1-gGblPara.m_nCutBoxWidth/2;
             qint32 nMainImgRectY=gGblPara.m_calCenterY1-gGblPara.m_nCutBoxHeight/2;
-            cv::Rect rectMainImgBox(nMainImgRectX,nMainImgRectY,gGblPara.m_nCutBoxWidth,gGblPara.m_nCutBoxHeight);
+            rectMain=cv::Rect(nMainImgRectX,nMainImgRectY,gGblPara.m_nCutBoxWidth,gGblPara.m_nCutBoxHeight);
             //check coordinates validation.
-            if(rectMainImgBox.x<0)
+            if(rectMain.x<0)
             {
-                rectMainImgBox.x=0;
+                rectMain.x=0;
             }
-            if(rectMainImgBox.y<0)
+            if(rectMain.y<0)
             {
-                rectMainImgBox.y=0;
+                rectMain.y=0;
             }
-            if((rectMainImgBox.x+rectMainImgBox.width)>mat1->cols)
+            if((rectMain.x+rectMain.width)>mat1->cols)
             {
-                rectMainImgBox.width=mat1->cols-rectMainImgBox.x-2;
+                rectMain.width=mat1->cols-rectMain.x-2;
             }
-            if((rectMainImgBox.y+rectMainImgBox.height)>mat1->rows)
+            if((rectMain.y+rectMain.height)>mat1->rows)
             {
-                rectMainImgBox.height=mat1->rows-rectMainImgBox.y-2;
+                rectMain.height=mat1->rows-rectMain.y-2;
             }
 
 
             //prepare a little mat.
-            cv::Mat matTemplate(*mat1,rectMainImgBox);
+            cv::Mat matTemplate(*mat1,rectMain);
 
             //do match template algorithm.
             cv::Mat matResult;
@@ -173,11 +188,11 @@ void ZImgProcThread::run()
 
 
             //draw a rectangle on main img.
-            cv::rectangle(*mat1,rectMainImgBox,cv::Scalar(0,255,0,255),2);
+            cv::rectangle(*mat1,rectMain,cv::Scalar(0,255,0,255),2);
 
             //draw a rectangle on aux img.
-            cv::Rect rectAuxImgBox(ptMatched.x,ptMatched.y,gGblPara.m_nCutBoxWidth,gGblPara.m_nCutBoxHeight);
-            cv::rectangle(*mat2,rectAuxImgBox,cv::Scalar(0,255,0,255),2);
+            rectAux=cv::Rect(ptMatched.x,ptMatched.y,gGblPara.m_nCutBoxWidth,gGblPara.m_nCutBoxHeight);
+            cv::rectangle(*mat2,rectAux,cv::Scalar(0,255,0,255),2);
         }
             break;
         case OPENCV_CSK_TRACKER:
@@ -185,35 +200,35 @@ void ZImgProcThread::run()
             if(!bTrackerInitBox)
             {
                 //init tracker box.
-                trackerBox.x=gGblPara.m_calCenterX1-gGblPara.m_nCutBoxWidth/2;
-                trackerBox.y=gGblPara.m_calCenterY1-gGblPara.m_nCutBoxHeight/2;
-                trackerBox.width=gGblPara.m_nCutBoxWidth;
-                trackerBox.height=gGblPara.m_nCutBoxHeight;
+                rectMain.x=gGblPara.m_calCenterX1-gGblPara.m_nCutBoxWidth/2;
+                rectMain.y=gGblPara.m_calCenterY1-gGblPara.m_nCutBoxHeight/2;
+                rectMain.width=gGblPara.m_nCutBoxWidth;
+                rectMain.height=gGblPara.m_nCutBoxHeight;
                 //check coordinates validation.
-                if(trackerBox.x<0)
+                if(rectMain.x<0)
                 {
-                    trackerBox.x=0;
+                    rectMain.x=0;
                 }
-                if(trackerBox.y<0)
+                if(rectMain.y<0)
                 {
-                    trackerBox.y=0;
+                    rectMain.y=0;
                 }
-                if((trackerBox.x+trackerBox.width)>mat1->cols)
+                if((rectMain.x+rectMain.width)>mat1->cols)
                 {
-                    trackerBox.width=mat1->cols-trackerBox.x-2;
+                    rectMain.width=mat1->cols-rectMain.x-2;
                 }
-                if((trackerBox.y+trackerBox.height)>mat1->rows)
+                if((rectMain.y+rectMain.height)>mat1->rows)
                 {
-                    trackerBox.height=mat1->rows-trackerBox.y-2;
+                    rectMain.height=mat1->rows-rectMain.y-2;
                 }
 
                 //define the center point.
-                trackerPtCenter.x=trackerBox.x+trackerBox.width/2;
-                trackerPtCenter.y=trackerBox.y+trackerBox.height/2;
+                trackerPtCenter.x=rectMain.x+rectMain.width/2;
+                trackerPtCenter.y=rectMain.y+rectMain.height/2;
 
                 //define target size.
-                trackerTargetSize.width=trackerBox.width;
-                trackerTargetSize.height=trackerBox.height;
+                trackerTargetSize.width=rectMain.width;
+                trackerTargetSize.height=rectMain.height;
 
                 bool bInitOkay=tracker.tracker_init(*mat1,trackerPtCenter,trackerTargetSize);
                 if(bInitOkay==false)
@@ -227,40 +242,76 @@ void ZImgProcThread::run()
                 bool bResult=tracker.tracker_update(*mat2,trackerPtCenter,trackerTargetSize);
                 if(bResult)
                 {
-                    cv::Rect2d trackedBox;
-                    trackedBox.x=trackerPtCenter.x-trackerTargetSize.width/2;
-                    trackedBox.y=trackerPtCenter.y-trackerTargetSize.height/2;
-                    trackedBox.width=trackerTargetSize.width;
-                    trackedBox.height=trackerTargetSize.height;
+                    rectAux.x=trackerPtCenter.x-trackerTargetSize.width/2;
+                    rectAux.y=trackerPtCenter.y-trackerTargetSize.height/2;
+                    rectAux.width=trackerTargetSize.width;
+                    rectAux.height=trackerTargetSize.height;
 
                     //to avoid reaching the boundary to cause openCV faults.
-                    if(trackedBox.x<0)
+                    if(rectAux.x<0)
                     {
-                        trackedBox.x=0;
+                        rectAux.x=0;
                     }
-                    if(trackedBox.y<0)
+                    if(rectAux.y<0)
                     {
-                        trackedBox.y=0;
+                        rectAux.y=0;
                     }
-                    if((trackedBox.x+trackedBox.width)>mat2->cols)
+                    if((rectAux.x+rectAux.width)>mat2->cols)
                     {
-                        trackedBox.width=mat2->cols-trackedBox.x-2;
+                        rectAux.width=mat2->cols-rectAux.x-2;
                     }
-                    if((trackedBox.y+trackedBox.height)>mat2->rows)
+                    if((rectAux.y+rectAux.height)>mat2->rows)
                     {
-                        trackedBox.height=mat2->rows-trackedBox.y-2;
+                        rectAux.height=mat2->rows-rectAux.y-2;
                     }
 
                     //draw a rectangle on main img.
-                    cv::rectangle(*mat1,trackerBox,cv::Scalar(0,255,0,255),2);
+                    cv::rectangle(*mat1,rectMain,cv::Scalar(0,255,0,255),2);
                     //draw a rectangle on aux img.
-                    cv::rectangle(*mat2,trackedBox,cv::Scalar(0,255,0,255),2);
+                    cv::rectangle(*mat2,rectAux,cv::Scalar(0,255,0,255),2);
 
-                    qDebug()<<"tracked okay:"<<trackedBox.x<<trackedBox.y<<trackedBox.width<<trackedBox.height;
+                    qDebug()<<"tracked okay:"<<rectAux.x<<rectAux.y<<rectAux.width<<rectAux.height;
                 }else{
                     qDebug()<<"tracking failure detected.ReInit track box.";
                     bTrackerInitBox=false;
                 }
+            }
+        }
+            break;
+        case OPENCV_KCF_TRACKER:
+        {
+            if(!bKCFTrackerInit)
+            {
+                //we cut a (w*h) box image centered on calibrate center(x,y).
+                qint32 nMainImgRectX=gGblPara.m_calCenterX1-gGblPara.m_nCutBoxWidth/2;
+                qint32 nMainImgRectY=gGblPara.m_calCenterY1-gGblPara.m_nCutBoxHeight/2;
+                cv::Rect rectMain(nMainImgRectX,nMainImgRectY,gGblPara.m_nCutBoxWidth,gGblPara.m_nCutBoxHeight);
+                //check coordinates validation.
+                if(rectMain.x<0)
+                {
+                    rectMain.x=0;
+                }
+                if(rectMain.y<0)
+                {
+                    rectMain.y=0;
+                }
+                if((rectMain.x+rectMain.width)>mat1->cols)
+                {
+                    rectMain.width=mat1->cols-rectMain.x-2;
+                }
+                if((rectMain.y+rectMain.height)>mat1->rows)
+                {
+                    rectMain.height=mat1->rows-rectMain.y-2;
+                }
+                trackerKCF.init(rectMain,*mat1);
+
+                bKCFTrackerInit=true;
+            }else{
+                rectAux=trackerKCF.update(*mat2);
+                //draw a rectangle on main img.
+                cv::rectangle(*mat1,rectMain,cv::Scalar(0,255,0,255),2);
+                //draw a rectangle on aux img.
+                cv::rectangle(*mat2,rectAux,cv::Scalar(0,255,0,255),2);
             }
         }
             break;

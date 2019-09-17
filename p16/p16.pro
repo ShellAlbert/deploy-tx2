@@ -70,7 +70,9 @@ SOURCES += main.cpp \
     ui/zmainui.cpp \
     imgproc/zvideotask.cpp \
     rtsp/zrtspaudiocapture.cpp \
-    imgproc/csk_tracker.cpp
+    imgproc/csk_tracker.cpp \
+    imgproc/KCF/fhog.cpp \
+    imgproc/KCF/kcftracker.cpp
     #libns.c
 
 
@@ -108,7 +110,13 @@ HEADERS += \
     ui/zmainui.h \
     imgproc/zvideotask.h \
     rtsp/zrtspaudiocapture.h \
-    imgproc/csk_tracker.h
+    imgproc/csk_tracker.h \
+    imgproc/KCF/ffttools.hpp \
+    imgproc/KCF/fhog.hpp \
+    imgproc/KCF/kcftracker.hpp \
+    imgproc/KCF/labdata.hpp \
+    imgproc/KCF/recttools.hpp \
+    imgproc/KCF/tracker.h
 
 INCLUDEPATH += /usr/include/gstreamer-1.0
 INCLUDEPATH += /usr/include/glib-2.0

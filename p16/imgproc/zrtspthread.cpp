@@ -64,7 +64,7 @@ void ZRtspThread::run()
                 this->sleep(3);
                 break;
             }
-            qDebug()<<this->m_rtspAddr<<"read img okay"<<mat.cols<<mat.rows<<mat.depth()<<mat.channels();
+            //qDebug()<<this->m_rtspAddr<<"read img okay"<<mat.cols<<mat.rows<<mat.depth()<<mat.channels();
             //black-white:gray: so channels()=1.
             //RGB: channels()=3.
             //qDebug()<<mat.cols<<mat.rows<<","<<mat.channels();

@@ -29,6 +29,7 @@ enum ImgProcAlgorithms
     IMGPROC_BYPASS=0,//bypass imgproc,do nothing.
     OPENCV_TEMPLATE_MATCH,
     OPENCV_CSK_TRACKER,
+    OPENCV_KCF_TRACKER,
 };
 
 //port define.

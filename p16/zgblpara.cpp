@@ -67,7 +67,7 @@ ZGblPara::ZGblPara()
     this->m_bJsonImgProOn=false;
 
     //imgproc algorithm.
-    this->m_nAlgorithm=OPENCV_CSK_TRACKER;
+    this->m_nAlgorithm=IMGPROC_BYPASS;
 }
 ZGblPara::~ZGblPara()
 {

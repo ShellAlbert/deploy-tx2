@@ -11,8 +11,10 @@ ZMainUI::ZMainUI(QWidget *parent):QWidget(parent)
     this->m_UIRht=NULL;
     this->m_hLayout=NULL;
 
-    this->m_btnTrackOn=NULL;
+    this->m_btnCSK=NULL;
+    this->m_btnKCF=NULL;
     this->m_btnTrackOff=NULL;
+    this->m_btnExit=NULL;
     this->m_hLayoutBtn=NULL;
 
     this->m_vLayout=NULL;
@@ -32,13 +34,21 @@ ZMainUI::~ZMainUI()
     {
         delete this->m_hLayout;
     }
-    if(this->m_btnTrackOn)
+    if(this->m_btnCSK)
     {
-        delete this->m_btnTrackOn;
+        delete this->m_btnCSK;
+    }
+    if(this->m_btnKCF)
+    {
+        this->m_btnKCF;
     }
     if(this->m_btnTrackOff)
     {
         delete this->m_btnTrackOff;
+    }
+    if(this->m_btnExit)
+    {
+        delete this->m_btnExit;
     }
     if(this->m_hLayoutBtn)
     {
@@ -72,8 +82,11 @@ qint32 ZMainUI::ZDoInit()
         this->m_UIRht=new ZImgDispUI("AUX");
         this->m_hLayout=new QHBoxLayout;
 
-        this->m_btnTrackOn=new QPushButton(tr("TrackeOn"));
-        this->m_btnTrackOff=new QPushButton(tr("TrackeOff"));
+        this->m_btnCSK=new QPushButton(tr("CSK"));
+        this->m_btnKCF=new QPushButton(tr("KCF"));
+        this->m_btnTrackOff=new QPushButton(tr("OFF"));
+
+        this->m_btnExit=new QPushButton(tr("EXIT"));
         this->m_hLayoutBtn=new QHBoxLayout;
         this->m_vLayout=new QVBoxLayout;
     }catch(...)
@@ -93,10 +106,17 @@ qint32 ZMainUI::ZDoInit()
     this->m_hLayout->addWidget(this->m_UILft);
     this->m_hLayout->addWidget(this->m_UIRht);
 
-    QObject::connect(this->m_btnTrackOn,SIGNAL(clicked(bool)),this,SLOT(ZSlotTrackOn()));
+    QObject::connect(this->m_btnCSK,SIGNAL(clicked(bool)),this,SLOT(ZSlotTrackCSK()));
+    QObject::connect(this->m_btnKCF,SIGNAL(clicked(bool)),this,SLOT(ZSlotTrackKCF()));
     QObject::connect(this->m_btnTrackOff,SIGNAL(clicked(bool)),this,SLOT(ZSlotTrackOff()));
-    this->m_hLayoutBtn->addWidget(this->m_btnTrackOn);
+
+    QObject::connect(this->m_btnExit,SIGNAL(clicked(bool)),this,SLOT(ZSlotExit()));
+
+    this->m_hLayoutBtn->addWidget(this->m_btnCSK);
+    this->m_hLayoutBtn->addWidget(this->m_btnKCF);
     this->m_hLayoutBtn->addWidget(this->m_btnTrackOff);
+    this->m_hLayoutBtn->addStretch(1);
+    this->m_hLayoutBtn->addWidget(this->m_btnExit);
 
     this->m_vLayout->addLayout(this->m_hLayout);
     this->m_vLayout->addLayout(this->m_hLayoutBtn);
@@ -147,14 +167,21 @@ void ZMainUI::ZSlotHelp2Exit()
 
 void ZMainUI::closeEvent(QCloseEvent *event)
 {
-    gGblPara.m_bGblRst2Exit=true;
     event->ignore();
 }
-void ZMainUI::ZSlotTrackOn()
+void ZMainUI::ZSlotTrackCSK()
 {
     gGblPara.m_nAlgorithm=OPENCV_CSK_TRACKER;
+}
+void ZMainUI::ZSlotTrackKCF()
+{
+    gGblPara.m_nAlgorithm=OPENCV_KCF_TRACKER;
 }
 void ZMainUI::ZSlotTrackOff()
 {
     gGblPara.m_nAlgorithm=IMGPROC_BYPASS;
+}
+void ZMainUI::ZSlotExit()
+{
+    gGblPara.m_bGblRst2Exit=true;
 }
