@@ -69,7 +69,8 @@ SOURCES += main.cpp \
     ui/zimgdispui.cpp \
     ui/zmainui.cpp \
     imgproc/zvideotask.cpp \
-    rtsp/zrtspaudiocapture.cpp
+    rtsp/zrtspaudiocapture.cpp \
+    imgproc/csk_tracker.cpp
     #libns.c
 
 
@@ -106,7 +107,8 @@ HEADERS += \
     ui/zimgdispui.h \
     ui/zmainui.h \
     imgproc/zvideotask.h \
-    rtsp/zrtspaudiocapture.h
+    rtsp/zrtspaudiocapture.h \
+    imgproc/csk_tracker.h
 
 INCLUDEPATH += /usr/include/gstreamer-1.0
 INCLUDEPATH += /usr/include/glib-2.0

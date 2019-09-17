@@ -65,6 +65,9 @@ ZGblPara::ZGblPara()
     //json thread.
     this->m_bJsonConnected=false;
     this->m_bJsonImgProOn=false;
+
+    //imgproc algorithm.
+    this->m_nAlgorithm=OPENCV_CSK_TRACKER;
 }
 ZGblPara::~ZGblPara()
 {

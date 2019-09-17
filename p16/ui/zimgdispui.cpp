@@ -52,3 +52,7 @@ void ZImgDispUI::ZSlotFlushImg(const QImage &img)
     this->m_counter++;
     this->update();
 }
+QSize ZImgDispUI::sizeHint() const
+{
+    return QSize(600,500);
+}

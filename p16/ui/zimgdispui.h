@@ -13,6 +13,7 @@ public:
     qint32 ZDoClean();
 protected:
     void paintEvent(QPaintEvent *event);
+    QSize sizeHint() const;
 public slots:
     void ZSlotFlushImg(const QImage &img);
 private:

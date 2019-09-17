@@ -18,9 +18,18 @@
 //#define APP_VERSION "0.1.0" //2018/07/10.
 #define APP_VERSION "0.2.0" //2019/1/7.
 
-//720p.
-#define RTSP_H264_WIDTH 1280
-#define RTSP_H264_HEIGHT 720
+//1920*1080,15fps,gray.
+#define RTSP_H264_WIDTH 1920
+#define RTSP_H264_HEIGHT 1080
+#define RTSP_H264_FPS   15
+
+//imgproc algorithms.
+enum ImgProcAlgorithms
+{
+    IMGPROC_BYPASS=0,//bypass imgproc,do nothing.
+    OPENCV_TEMPLATE_MATCH,
+    OPENCV_CSK_TRACKER,
+};
 
 //port define.
 #define TCP_PORT_AUDIO  6801 //传输opus音频
@@ -207,6 +216,8 @@ public:
     //image processing on flag.
     bool m_bJsonImgProOn;
 
+    //imgproc algorithm.
+    ImgProcAlgorithms m_nAlgorithm;
 public:
     //audio related parameters.
     ZAudioParam m_audio;

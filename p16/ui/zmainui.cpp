@@ -10,15 +10,16 @@ ZMainUI::ZMainUI(QWidget *parent):QWidget(parent)
     this->m_UILft=NULL;
     this->m_UIRht=NULL;
     this->m_hLayout=NULL;
+
+    this->m_btnTrackOn=NULL;
+    this->m_btnTrackOff=NULL;
+    this->m_hLayoutBtn=NULL;
+
     this->m_vLayout=NULL;
 }
 
 ZMainUI::~ZMainUI()
 {
-    if(this->m_llTop)
-    {
-        delete this->m_llTop;
-    }
     if(this->m_UILft)
     {
         delete this->m_UILft;
@@ -30,6 +31,18 @@ ZMainUI::~ZMainUI()
     if(this->m_hLayout)
     {
         delete this->m_hLayout;
+    }
+    if(this->m_btnTrackOn)
+    {
+        delete this->m_btnTrackOn;
+    }
+    if(this->m_btnTrackOff)
+    {
+        delete this->m_btnTrackOff;
+    }
+    if(this->m_hLayoutBtn)
+    {
+        delete this->m_hLayoutBtn;
     }
     if(this->m_vLayout)
     {
@@ -55,11 +68,13 @@ ZImgDispUI* ZMainUI::ZGetDispUI(qint32 index)
 qint32 ZMainUI::ZDoInit()
 {
     try{
-        this->m_llTop=new QLabel;
-        this->m_llTop->setText(tr("TWO RTSP ETHERNET CAMERA"));
         this->m_UILft=new ZImgDispUI("MAIN",true);
         this->m_UIRht=new ZImgDispUI("AUX");
         this->m_hLayout=new QHBoxLayout;
+
+        this->m_btnTrackOn=new QPushButton(tr("TrackeOn"));
+        this->m_btnTrackOff=new QPushButton(tr("TrackeOff"));
+        this->m_hLayoutBtn=new QHBoxLayout;
         this->m_vLayout=new QVBoxLayout;
     }catch(...)
     {
@@ -77,8 +92,15 @@ qint32 ZMainUI::ZDoInit()
     }
     this->m_hLayout->addWidget(this->m_UILft);
     this->m_hLayout->addWidget(this->m_UIRht);
+
+    QObject::connect(this->m_btnTrackOn,SIGNAL(clicked(bool)),this,SLOT(ZSlotTrackOn()));
+    QObject::connect(this->m_btnTrackOff,SIGNAL(clicked(bool)),this,SLOT(ZSlotTrackOff()));
+    this->m_hLayoutBtn->addWidget(this->m_btnTrackOn);
+    this->m_hLayoutBtn->addWidget(this->m_btnTrackOff);
+
     this->m_vLayout->addLayout(this->m_hLayout);
-    this->m_vLayout->addWidget(this->m_llTop);
+    this->m_vLayout->addLayout(this->m_hLayoutBtn);
+    this->m_vLayout->addStretch(1);
     this->setLayout(this->m_vLayout);
 
     return 0;
@@ -127,4 +149,12 @@ void ZMainUI::closeEvent(QCloseEvent *event)
 {
     gGblPara.m_bGblRst2Exit=true;
     event->ignore();
+}
+void ZMainUI::ZSlotTrackOn()
+{
+    gGblPara.m_nAlgorithm=OPENCV_CSK_TRACKER;
+}
+void ZMainUI::ZSlotTrackOff()
+{
+    gGblPara.m_nAlgorithm=IMGPROC_BYPASS;
 }
