@@ -35,6 +35,7 @@ private:
     ZImgDispUI *m_UIRht;//the right aux camera.
     QHBoxLayout *m_hLayout;
 
+    QPushButton *m_btnImgProcOn;
     QPushButton *m_btnTM;
     QPushButton *m_btnCSK;
     QPushButton *m_btnKCF;
@@ -48,6 +49,7 @@ public:
     qint32 ZManageThreads(ZAudioTask *audio,ZTcp2UartForwardThread *tcp2uart,ZJsonThread *json,ZVideoTask *video);
 private slots:
     void ZSlotHelp2Exit();
+    void ZSlotImgProcOn();
     void ZSlotTemplateMatch();
     void ZSlotTrackCSK();
     void ZSlotTrackKCF();

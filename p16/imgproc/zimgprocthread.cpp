@@ -36,8 +36,8 @@ qint32 ZImgProcThread::ZBindQueue2(QMutex *mutex,///<
 void ZImgProcThread::run()
 {
     //allocate temporary buffer.
-    cv::Mat *matMainImg=new cv::Mat(RTSP_H264_HEIGHT,RTSP_H264_WIDTH,CV_8UC1);
-    cv::Mat *matAuxImg=new cv::Mat(RTSP_H264_HEIGHT,RTSP_H264_WIDTH,CV_8UC1);
+    cv::Mat *matMainImg=new cv::Mat(ImgResizedHeight,ImgResizedWidth,CV_8UC1);
+    cv::Mat *matAuxImg=new cv::Mat(ImgResizedHeight,ImgResizedWidth,CV_8UC1);
 
     //rectangle for main&aux img.
     cv::Rect rectMain;
@@ -61,6 +61,7 @@ void ZImgProcThread::run()
     bool bKCFTrackerInit=false;
 
     //the main loop.
+    qDebug()<<"imgproc thread start.";
     while(!gGblPara.m_bGblRst2Exit)
     {
 
@@ -106,7 +107,8 @@ void ZImgProcThread::run()
 
         //3.do image algorithm.
         //qDebug()<<"imgproc fetch 2 images okay.";
-
+        qint32 nCalCenterX1=gGblPara.m_calCenterX1*gImgResizeRatioW;
+        qint32 nCalCenterY1=gGblPara.m_calCenterY1*gImgResizeRatioH;
         switch(gGblPara.m_nAlgorithm)
         {
         case IMGPROC_BYPASS:
@@ -114,8 +116,8 @@ void ZImgProcThread::run()
             //bypass imgproc,do nothing here.
 
             //draw a rectangle on main img for indicate object selection.
-            qint32 nMainImgRectX=gGblPara.m_calCenterX1-gGblPara.m_nCutBoxWidth/2;
-            qint32 nMainImgRectY=gGblPara.m_calCenterY1-gGblPara.m_nCutBoxHeight/2;
+            qint32 nMainImgRectX=nCalCenterX1-gGblPara.m_nCutBoxWidth/2;
+            qint32 nMainImgRectY=nCalCenterY1-gGblPara.m_nCutBoxHeight/2;
             rectMain=cv::Rect(nMainImgRectX,nMainImgRectY,gGblPara.m_nCutBoxWidth,gGblPara.m_nCutBoxHeight);
             //check coordinates validation.
             if(rectMain.x<0)
@@ -144,8 +146,8 @@ void ZImgProcThread::run()
         case OPENCV_TEMPLATE_MATCH:
         {
             //we cut a (w*h) box image centered on calibrate center(x,y).
-            qint32 nMainImgRectX=gGblPara.m_calCenterX1-gGblPara.m_nCutBoxWidth/2;
-            qint32 nMainImgRectY=gGblPara.m_calCenterY1-gGblPara.m_nCutBoxHeight/2;
+            qint32 nMainImgRectX=nCalCenterX1-gGblPara.m_nCutBoxWidth/2;
+            qint32 nMainImgRectY=nCalCenterY1-gGblPara.m_nCutBoxHeight/2;
             rectMain=cv::Rect(nMainImgRectX,nMainImgRectY,gGblPara.m_nCutBoxWidth,gGblPara.m_nCutBoxHeight);
             //check coordinates validation.
             if(rectMain.x<0)
@@ -199,8 +201,8 @@ void ZImgProcThread::run()
             if(!bTrackerInitBox)
             {
                 //init tracker box.
-                rectMain.x=gGblPara.m_calCenterX1-gGblPara.m_nCutBoxWidth/2;
-                rectMain.y=gGblPara.m_calCenterY1-gGblPara.m_nCutBoxHeight/2;
+                rectMain.x=nCalCenterX1-gGblPara.m_nCutBoxWidth/2;
+                rectMain.y=nCalCenterY1-gGblPara.m_nCutBoxHeight/2;
                 rectMain.width=gGblPara.m_nCutBoxWidth;
                 rectMain.height=gGblPara.m_nCutBoxHeight;
                 //check coordinates validation.
@@ -282,8 +284,8 @@ void ZImgProcThread::run()
             if(!bKCFTrackerInit)
             {
                 //we cut a (w*h) box image centered on calibrate center(x,y).
-                qint32 nMainImgRectX=gGblPara.m_calCenterX1-gGblPara.m_nCutBoxWidth/2;
-                qint32 nMainImgRectY=gGblPara.m_calCenterY1-gGblPara.m_nCutBoxHeight/2;
+                qint32 nMainImgRectX=nCalCenterX1-gGblPara.m_nCutBoxWidth/2;
+                qint32 nMainImgRectY=nCalCenterY1-gGblPara.m_nCutBoxHeight/2;
                 cv::Rect rectMain(nMainImgRectX,nMainImgRectY,gGblPara.m_nCutBoxWidth,gGblPara.m_nCutBoxHeight);
                 //check coordinates validation.
                 if(rectMain.x<0)
@@ -327,4 +329,6 @@ void ZImgProcThread::run()
 
     delete matMainImg;
     delete matAuxImg;
+
+    qDebug()<<"imgproc thread done.";
 }

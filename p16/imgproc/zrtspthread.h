@@ -28,8 +28,6 @@ protected:
 signals:
     void ZSigConnected();
     void ZSigConnectionLost();
-    void ZSigNewImg(const QImage &img);
-
 private:
     bool m_bCleanup;
 private:

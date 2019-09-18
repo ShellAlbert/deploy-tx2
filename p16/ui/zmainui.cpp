@@ -12,6 +12,7 @@ ZMainUI::ZMainUI(QWidget *parent):QWidget(parent)
     this->m_hLayout=NULL;
 
 
+    this->m_btnImgProcOn=NULL;
     this->m_btnTM=NULL;
     this->m_btnCSK=NULL;
     this->m_btnKCF=NULL;
@@ -36,6 +37,10 @@ ZMainUI::~ZMainUI()
     {
         delete this->m_hLayout;
     }
+    if(this->m_btnImgProcOn)
+    {
+        delete this->m_btnImgProcOn;
+    }
     if(this->m_btnTM)
     {
         delete this->m_btnTM;
@@ -46,7 +51,7 @@ ZMainUI::~ZMainUI()
     }
     if(this->m_btnKCF)
     {
-        this->m_btnKCF;
+        delete this->m_btnKCF;
     }
     if(this->m_btnTrackOff)
     {
@@ -88,6 +93,7 @@ qint32 ZMainUI::ZDoInit()
         this->m_UIRht=new ZImgDispUI("AUX");
         this->m_hLayout=new QHBoxLayout;
 
+        this->m_btnImgProcOn=new QPushButton(tr("ImgProcOn"));
         this->m_btnTM=new QPushButton(tr("TemplateMatch"));
         this->m_btnCSK=new QPushButton(tr("CSK"));
         this->m_btnKCF=new QPushButton(tr("KCF"));
@@ -113,6 +119,7 @@ qint32 ZMainUI::ZDoInit()
     this->m_hLayout->addWidget(this->m_UILft);
     this->m_hLayout->addWidget(this->m_UIRht);
 
+    QObject::connect(this->m_btnImgProcOn,SIGNAL(clicked(bool)),this,SLOT(ZSlotImgProcOn()));
     QObject::connect(this->m_btnTM,SIGNAL(clicked(bool)),this,SLOT(ZSlotTemplateMatch()));
     QObject::connect(this->m_btnCSK,SIGNAL(clicked(bool)),this,SLOT(ZSlotTrackCSK()));
     QObject::connect(this->m_btnKCF,SIGNAL(clicked(bool)),this,SLOT(ZSlotTrackKCF()));
@@ -120,6 +127,7 @@ qint32 ZMainUI::ZDoInit()
 
     QObject::connect(this->m_btnExit,SIGNAL(clicked(bool)),this,SLOT(ZSlotExit()));
 
+    this->m_hLayoutBtn->addWidget(this->m_btnImgProcOn);
     this->m_hLayoutBtn->addWidget(this->m_btnTM);
     this->m_hLayoutBtn->addWidget(this->m_btnCSK);
     this->m_hLayoutBtn->addWidget(this->m_btnKCF);
@@ -177,6 +185,17 @@ void ZMainUI::ZSlotHelp2Exit()
 void ZMainUI::closeEvent(QCloseEvent *event)
 {
     event->ignore();
+}
+void ZMainUI::ZSlotImgProcOn()
+{
+    if(this->m_btnImgProcOn->text()=="ImgProcOn")
+    {
+        gGblPara.m_bJsonImgProOn=true;
+        this->m_btnImgProcOn->setText(tr("ImgProcOff"));
+    }else{
+        gGblPara.m_bJsonImgProOn=false;
+        this->m_btnImgProcOn->setText(tr("ImgProcOn"));
+    }
 }
 void ZMainUI::ZSlotTemplateMatch()
 {

@@ -123,17 +123,17 @@ void ZGblPara::writeCfgFile()
 }
 void ZGblPara::initCfgFile()
 {
-    gGblPara.m_calCenterX1=0;
-    gGblPara.m_calCenterY1=0;
+    gGblPara.m_calCenterX1=RTSP_H264_WIDTH/2;
+    gGblPara.m_calCenterY1=RTSP_H264_HEIGHT/2;
 
-    gGblPara.m_calCenterX2=0;
-    gGblPara.m_calCenterY2=0;
+    gGblPara.m_calCenterX2=RTSP_H264_WIDTH/2;
+    gGblPara.m_calCenterY2=RTSP_H264_HEIGHT/2;
 
-    gGblPara.m_calCenterX3=0;
-    gGblPara.m_calCenterY3=0;
+    gGblPara.m_calCenterX3=RTSP_H264_WIDTH/2;
+    gGblPara.m_calCenterY3=RTSP_H264_HEIGHT/2;
 
-    gGblPara.m_nCutBoxWidth=200;
-    gGblPara.m_nCutBoxHeight=200;
+    gGblPara.m_nCutBoxWidth=50;
+    gGblPara.m_nCutBoxHeight=50;
 
     this->writeCfgFile();
 }

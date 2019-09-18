@@ -23,6 +23,13 @@
 #define RTSP_H264_HEIGHT 1080
 #define RTSP_H264_FPS   15
 
+//we resize the captured image to reduce imgproc time.
+//resize range:0.1~1.0
+#define gImgResizeRatioW (0.3)
+#define gImgResizeRatioH (0.3)
+#define ImgResizedWidth  (RTSP_H264_WIDTH*gImgResizeRatioW)
+#define ImgResizedHeight (RTSP_H264_HEIGHT*gImgResizeRatioH)
+
 //imgproc algorithms.
 enum ImgProcAlgorithms
 {
