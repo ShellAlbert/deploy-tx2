@@ -4,6 +4,12 @@
 #include <zgblpara.h>
 #include <string.h>
 #include <QDebug>
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/utility.hpp>
+#include <opencv2/video.hpp>
+#include <opencv2/videoio.hpp>
+#include <opencv2/core/ocl.hpp>
+#include <opencv2/highgui.hpp>
 ZImgProcThread::ZImgProcThread()
 {
 
@@ -51,14 +57,16 @@ void ZImgProcThread::run()
     cv::Size trackerTargetSize;
     bool bTrackerInitBox=false;
 
+#if 1
     //openCV KCF tracker algorithm initial code here.
-    bool HOG=true;
+    bool HOG=false; //true for RGB,false for gray.
     bool FIXEDWINDOW=false;
     bool MULTISCALE=true;
     bool LAB=false;
     // Create KCFTracker object
     KCFTracker trackerKCF(HOG, FIXEDWINDOW, MULTISCALE, LAB);
     bool bKCFTrackerInit=false;
+#endif
 
     //the main loop.
     qDebug()<<"imgproc thread start.";
@@ -140,7 +148,7 @@ void ZImgProcThread::run()
 
             //cause to reinit tracker when algorithm changes.
             bTrackerInitBox=false;
-            bKCFTrackerInit=false;
+            //bKCFTrackerInit=false;
         }
             break;
         case OPENCV_TEMPLATE_MATCH:
@@ -180,6 +188,7 @@ void ZImgProcThread::run()
             double fMinVal,fMaxVal;
             cv::Point ptMinLoc,ptMaxLoc,ptMatched;
             cv::minMaxLoc(matResult,&fMinVal,&fMaxVal,&ptMinLoc,&ptMaxLoc,cv::Mat());
+            qDebug("min=%.2f,max=%.2f\n",fMinVal,fMaxVal);
             ptMatched=ptMinLoc;//the minimum is the best for CV_TM_SQDIFF_NORMED.
 
             //generate the pixel coordinate different value.
@@ -192,7 +201,7 @@ void ZImgProcThread::run()
             cv::rectangle(*matMainImg,rectMain,cv::Scalar(0,255,0,255),2);
 
             //draw a rectangle on aux img.
-            rectAux=cv::Rect(ptMatched.x,ptMatched.y,gGblPara.m_nCutBoxWidth,gGblPara.m_nCutBoxHeight);
+            rectAux=cv::Rect(ptMatched.x,ptMatched.y,matTemplate.cols,matTemplate.rows);
             cv::rectangle(*matAuxImg,rectAux,cv::Scalar(0,255,0,255),2);
         }
             break;
@@ -280,6 +289,7 @@ void ZImgProcThread::run()
         }
             break;
         case OPENCV_KCF_TRACKER:
+#if 1
         {
             if(!bKCFTrackerInit)
             {
@@ -315,6 +325,7 @@ void ZImgProcThread::run()
                 cv::rectangle(*matAuxImg,rectAux,cv::Scalar(0,255,0,255),2);
             }
         }
+#endif
             break;
         default:
             break;
