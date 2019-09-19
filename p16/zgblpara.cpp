@@ -65,6 +65,8 @@ ZGblPara::ZGblPara()
     //json thread.
     this->m_bJsonConnected=false;
     this->m_bJsonImgProOn=false;
+    this->m_nDiffX=0;
+    this->m_nDiffY=0;
 
     //imgproc algorithm.
     this->m_nAlgorithm=IMGPROC_BYPASS;

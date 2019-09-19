@@ -81,21 +81,20 @@ void ZRtspThread::run()
 
                 //4.add image to fifo.
                 //4.1 fetch a free buffer in freeQueue.
+                bool bProcNextTime=false;
                 this->m_mutex->lock();
                 while(this->m_queueFree->isEmpty())
                 {
                     if(!this->m_condNotFull->wait(this->m_mutex,5000))
                     {
                         this->m_mutex->unlock();
-                        if(gGblPara.m_bGblRst2Exit)
-                        {
-                            break;
-                        }
+                        bProcNextTime=true;
+                        break;
                     }
                 }
-                if(gGblPara.m_bGblRst2Exit)
+                if(bProcNextTime)
                 {
-                    break;
+                    continue;
                 }
 
                 //here,we resize image size to reduce imgproc time.

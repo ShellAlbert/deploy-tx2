@@ -1,5 +1,6 @@
 #include "zvideotask.h"
 #include "../ui/zmainui.h"
+#include <QDebug>
 ZVideoTask::ZVideoTask(QObject *parent):QObject(parent)
 {
     this->m_rtsp1=NULL;

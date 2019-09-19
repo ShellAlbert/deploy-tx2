@@ -84,10 +84,8 @@ void ZImgProcThread::run()
     qDebug()<<"imgproc thread start.";
     while(!gGblPara.m_bGblRst2Exit)
     {
-
-        bool bProcNextTime=false;
-
         //1.fetch image from queue1.
+        bool bProcNextTime=false;
         this->m_mutex1->lock();
         while(this->m_queueUsed1->size()<=0)
         {
@@ -110,14 +108,20 @@ void ZImgProcThread::run()
 
 
         //2.fetch image from queue2.
+        bool bProcNextTime2=false;
         this->m_mutex2->lock();
         while(this->m_queueUsed2->size()<=0)
         {
             if(!this->m_condNotEmpty2->wait(this->m_mutex2,5000))
             {
                 this->m_mutex2->unlock();
+                bProcNextTime2=true;
                 break;
             }
+        }
+        if(bProcNextTime2)
+        {
+            continue;
         }
         cv::Mat *matBase2=this->m_queueUsed2->dequeue();
         memcpy(matAuxImg->data,matBase2->data,matBase2->cols*matBase2->rows*matBase2->channels());
@@ -200,21 +204,30 @@ void ZImgProcThread::run()
             double fMinVal,fMaxVal;
             cv::Point ptMinLoc,ptMaxLoc,ptMatched;
             cv::minMaxLoc(matResult,&fMinVal,&fMaxVal,&ptMinLoc,&ptMaxLoc,cv::Mat());
-            qDebug("min=%.2f,max=%.2f\n",fMinVal,fMaxVal);
+            //qDebug("min=%.2f,max=%.2f\n",fMinVal,fMaxVal);
             ptMatched=ptMinLoc;//the minimum is the best for CV_TM_SQDIFF_NORMED.
 
             //generate the pixel coordinate different value.
-            qint32 nDiffX=nMainImgRectX-ptMatched.x;
-            qint32 nDiffY=nMainImgRectY-ptMatched.y;
-            qDebug()<<nDiffX<<nDiffY;
+            gGblPara.m_nDiffX=nMainImgRectX-ptMatched.x;
+            gGblPara.m_nDiffY=nMainImgRectY-ptMatched.y;
+            qDebug()<<gGblPara.m_nDiffX<<gGblPara.m_nDiffY;
 
 
             //draw a rectangle on main img.
             cv::rectangle(*matMainImg,rectMain,cv::Scalar(0,255,0,255),2);
 
-            //draw a rectangle on aux img.
+            //draw a matched rectangle on aux img.
             rectAux=cv::Rect(ptMatched.x,ptMatched.y,matTemplate.cols,matTemplate.rows);
             cv::rectangle(*matAuxImg,rectAux,cv::Scalar(0,255,0,255),2);
+
+            //draw a line from calibrate center to matched center.
+            qint32 nCalCenterX2=gGblPara.m_calCenterX2*gImgResizeRatioW;
+            qint32 nCalCenterY2=gGblPara.m_calCenterY2*gImgResizeRatioH;
+            cv::Point p1(nCalCenterX2+matTemplate.cols/2,nCalCenterY2+matTemplate.rows/2);
+            cv::Point p2(ptMatched.x+matTemplate.cols/2,ptMatched.y+matTemplate.rows/2);
+            //qDebug()<<"("<<p1.x<<","<<p1.y<<")"<<"-->("<<p2.x<<","<<p2.y<<")";
+            cv::line(*matAuxImg,p1,p2,cv::Scalar(0,255,0,255),2);
+
         }
             break;
         case OPENCV_CSK_TRACKER:

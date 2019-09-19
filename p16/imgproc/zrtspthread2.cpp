@@ -80,8 +80,8 @@ void ZRtspThread2::run()
             this->usleep(1000*100);
         }
     }
-    this->m_bCleanup=true;
     qDebug()<<"rtsp thread"<<this->m_rtspAddr<<"done.";
+    this->m_bCleanup=true;
     return;
 }
 bool ZRtspThread2::ZIsCleanup()

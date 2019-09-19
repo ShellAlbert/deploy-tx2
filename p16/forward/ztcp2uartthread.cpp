@@ -19,6 +19,7 @@ qint32 ZTcp2UartForwardThread::ZStopThread()
 }
 void ZTcp2UartForwardThread::run()
 {
+    qDebug()<<"Tcp2Uart thread start.";
     /*sudo chmod 777 /dev/ttyTHS2*/
     QSerialPort *uart=new QSerialPort;
     uart->setPortName("/dev/ttyTHS2");
@@ -29,15 +30,16 @@ void ZTcp2UartForwardThread::run()
     uart->setFlowControl(QSerialPort::NoFlowControl);
     if(!uart->open(QIODevice::ReadWrite))
     {
-        qDebug()<<"<error>:Tcp2Uart cannot open uart device.";
-        //此处设置全局请求退出标志,请求其他线程退出.
-        gGblPara.m_bGblRst2Exit=true;
+        qDebug()<<"failed to open uart"<<uart->portName();
         delete uart;
+        uart=NULL;
         this->m_bCleanup=true;
+        //set global request to exit flag to notify other threads to terminate.
+        gGblPara.m_bGblRst2Exit=true;
+        qDebug()<<"Tcp2Uart thread done.";
         return;
     }
 
-    qDebug()<<"<MainLoop>:Tcp2UartThread starts.";
     this->m_bCleanup=false;
     while(!gGblPara.m_bGblRst2Exit)
     {
@@ -47,12 +49,12 @@ void ZTcp2UartForwardThread::run()
         setsockopt(sockFd,SOL_SOCKET,SO_REUSEADDR,&on,sizeof(on));
         if(!tcpServer->listen(QHostAddress::Any,TCP_PORT_FORWARD))
         {
-            qDebug()<<"<error>: Tcp2Uart server listen error on port:"<<TCP_PORT_FORWARD;
+            qDebug()<<"Tcp2Uart failed to listen on port:"<<TCP_PORT_FORWARD;
             this->sleep(3);
             delete tcpServer;
             continue;
         }
-        qDebug()<<"<Tcp2Uart>: listen on tcp "<<TCP_PORT_FORWARD;
+        qDebug()<<"Tcp2Uart listen on tcp "<<TCP_PORT_FORWARD;
         //wait until get a new connection.
         while(!gGblPara.m_bGblRst2Exit)
         {
@@ -66,21 +68,20 @@ void ZTcp2UartForwardThread::run()
         QTcpSocket *tcpSocket=tcpServer->nextPendingConnection();
         if(tcpSocket)
         {
-            //客户端连接上后，就判断服务监听端，这样只允许一个tcp连接.
+            //close server once one client connected.
+            //only allow one client connected at moment.
             tcpServer->close();
 
-            //设置连接标志.
+            //set connected flag.
             gGblPara.m_bTcp2UartConnected=true;
-            qDebug()<<"Tcp2Uart connected.";
 
             while(!gGblPara.m_bGblRst2Exit)
             {
-#if 0
-                //只有开启图像匹配功能时才tx diffXY to uart.
-                if(gGblPara.m_bJsonImgPro)
+                //only ImgProc On then tx diffXY to uart.
+                if(gGblPara.m_bJsonImgProOn)
                 {
-                    qint16 nDiffX=gGblPara.m_video.m_nDiffX;
-                    qint16 nDiffY=gGblPara.m_video.m_nDiffY;
+                    qint16 nDiffX=gGblPara.m_nDiffX;
+                    qint16 nDiffY=gGblPara.m_nDiffY;
                     QByteArray baCmd;
                     baCmd.resize(12);
                     baCmd[0]=0x5A;//frame head.
@@ -99,11 +100,11 @@ void ZTcp2UartForwardThread::run()
                     uart->write(baCmd);
                     if(!uart->waitForBytesWritten(SOCKET_TX_TIMEOUT))
                     {
-                        qDebug()<<"<error>:Tcp2Uart failed to tx DiffXY "<<uart->errorString();
+                        qDebug()<<"Tcp2Uart failed to tx DiffXY "<<uart->errorString();
                         break;
                     }
                 }
-#endif
+
                 //read data from tcp and write it to uart.
                 if(tcpSocket->waitForReadyRead(50))//100ms.
                 {
@@ -112,7 +113,7 @@ void ZTcp2UartForwardThread::run()
                     uart->write(baFromTcp);
                     if(!uart->waitForBytesWritten(1000))
                     {
-                        qDebug()<<"<error>:Tcp2Uart failed to forward tcp to uart "<<uart->errorString();
+                        qDebug()<<"Tcp2Uart failed to forward tcp to uart "<<uart->errorString();
                         break;
                     }
                     gGblPara.m_nTcp2UartBytes+=baFromTcp.size();
@@ -125,7 +126,7 @@ void ZTcp2UartForwardThread::run()
                     tcpSocket->write(baFromUart);
                     if(!tcpSocket->waitForBytesWritten(1000))
                     {
-                        qDebug()<<"<error>:Tcp2Uart failed to forward uart to tcp:"<<tcpSocket->errorString();
+                        qDebug()<<"Tcp2Uart failed to forward uart to tcp:"<<tcpSocket->errorString();
                         break;
                     }
                     gGblPara.m_nUart2TcpBytes+=baFromUart.size();
@@ -134,25 +135,26 @@ void ZTcp2UartForwardThread::run()
                 //check tcp socket state.
                 if(tcpSocket->state()!=QAbstractSocket::ConnectedState)
                 {
-                    qDebug()<<"<Warning>:Tcp2Uart socket broken.";
+                    qWarning()<<"Tcp2Uart socket broken.";
                     break;
                 }
             }
 
-            //设置连接标志.
+            //set disconnect flag.
             gGblPara.m_bTcp2UartConnected=false;
-            qDebug()<<"Tcp2Uart disconnected.";
         }
         delete tcpServer;
         tcpServer=NULL;
     }
-    //退出主循环,做清理工作.
+    //do clean work here.
     uart->close();
     delete uart;
-    qDebug()<<"<MainLoop>:Tcp2UartThread ends.";
+    uart=NULL;
+    this->m_bCleanup=true;
+    qDebug()<<"Tcp2Uart thread done.";
+
     //set global request exit flag to notify other threads.
     gGblPara.m_bGblRst2Exit=true;
-    this->m_bCleanup=true;
     return;
 }
 bool ZTcp2UartForwardThread::ZIsCleanup()

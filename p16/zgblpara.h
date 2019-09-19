@@ -223,6 +223,8 @@ public:
     bool m_bJsonConnected;
     //image processing on flag.
     bool m_bJsonImgProOn;
+    qint32 m_nDiffX;
+    qint32 m_nDiffY;
 
     //imgproc algorithm.
     ImgProcAlgorithms m_nAlgorithm;

@@ -98,7 +98,7 @@ void gSIGHandler(int sigNo)
     case SIGINT:
     case SIGKILL:
     case SIGTERM:
-        qDebug()<<"prepare to exit...";
+        qDebug()<<"<p16>:prepare to exit...";
         gGblPara.m_bGblRst2Exit=true;
         break;
     default:
@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
     ZAudioTask *audio=new ZAudioTask;
     if(audio->ZStartTask()<0)
     {
-        qDebug()<<"<error>:failed to start audio task!";
+        qDebug()<<"failed to start audio task!";
         return -1;
     }
 
@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
     ZTcp2UartForwardThread *tcp2uart=new ZTcp2UartForwardThread;
     if(tcp2uart->ZStartThread()<0)
     {
-        qDebug()<<"<error>:failed to start tcp2uart thread!";
+        qDebug()<<"failed to start tcp2uart thread!";
         return -1;
     }
 
@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
     ZJsonThread *json=new ZJsonThread;
     if(json->ZStartThread()<0)
     {
-        qDebug()<<"<error>:failed to start json thread!";
+        qDebug()<<"failed to start json thread!";
         return -1;
     }
 #endif
@@ -196,14 +196,14 @@ int main(int argc, char *argv[])
     ZMainUI *ui=new ZMainUI;
     if(ui->ZDoInit()<0)
     {
-        qDebug()<<"<error>:failed to initial main window.";
+        qDebug()<<"failed to initial main window.";
         return -1;
     }
     //5.video task.
     ZVideoTask *video=new ZVideoTask;
     if(video->ZStartTask(ui)<0)
     {
-        qDebug()<<"<error>:failed to start video task.";
+        qDebug()<<"failed to start video task.";
         return -1;
     }
 
@@ -217,12 +217,11 @@ int main(int argc, char *argv[])
     //Set the signal callback for Ctrl-C
     signal(SIGINT,gSIGHandler);
 
-#if 0
     //write pid to file.
     QFile filePID("/tmp/p16.pid");
     if(!filePID.open(QIODevice::WriteOnly))
     {
-        qDebug()<<"<error>:error to write pid file."<<filePID.errorString();
+        qDebug()<<"error to write pid file."<<filePID.errorString();
         return -1;
     }
     char pidBuffer[32];
@@ -231,7 +230,7 @@ int main(int argc, char *argv[])
     filePID.write(pidBuffer,strlen(pidBuffer));
     filePID.close();
     qDebug()<<"write pid to /tmp/p16.pid,"<<pidBuffer<<".";
-#endif
+
 
     //enter event loop until exit() was called.
     ret=p16.exec();
@@ -253,7 +252,7 @@ int main(int argc, char *argv[])
     delete video;
     video=NULL;
 
-    qDebug()<<"<exit>:done.";
+    qDebug()<<"<p16>:done.";
     return ret;
 #endif
 }
