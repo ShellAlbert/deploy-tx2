@@ -1,34 +1,17 @@
-#include "zrtspthread.h"
+#include "zrtspthread2.h"
 #include <zgblpara.h>
 #include <QDebug>
-ZRtspThread::ZRtspThread(QString rtspAddr)
+ZRtspThread2::ZRtspThread2(QString rtspAddr)
 {
     this->m_rtspAddr=rtspAddr;
     this->m_bCleanup=false;
 
-
-    this->m_mutex=NULL;
-    this->m_condNotEmpty=NULL;
-    this->m_condNotFull=NULL;
-    this->m_queueFree=NULL;
-    this->m_queueUsed=NULL;
 }
-qint32 ZRtspThread::ZBindQueue(QMutex *mutex,///<
-                               QWaitCondition *condNotEmpty,QWaitCondition *condNotFull,///<
-                               QQueue<cv::Mat*> *queueFree,QQueue<cv::Mat*> *queueUsed)
-{
-    this->m_mutex=mutex;
-    this->m_condNotEmpty=condNotEmpty;
-    this->m_condNotFull=condNotFull;
-    this->m_queueFree=queueFree;
-    this->m_queueUsed=queueUsed;
 
-    return 0;
-}
 
 //XiongMai IP Camera must be set to Black/White mode before running this thread.
 //1920*1080*15fps,gray.
-void ZRtspThread::run()
+void ZRtspThread2::run()
 {
     //CAUTION HERE!!!
     // videoconvert is more slower than nvvidconv.
@@ -63,7 +46,7 @@ void ZRtspThread::run()
             emit this->ZSigConnected();
 
             //2.loop to read image.
-            cv::Mat mat,matResize;
+            cv::Mat mat;
             while(!gGblPara.m_bGblRst2Exit)
             {
                 if(!cap.read(mat))
@@ -79,34 +62,10 @@ void ZRtspThread::run()
                 //RGB: channels()=3.
                 //qDebug()<<mat.cols<<mat.rows<<","<<mat.channels();
 
-                //4.add image to fifo.
-                //4.1 fetch a free buffer in freeQueue.
-                this->m_mutex->lock();
-                while(this->m_queueFree->isEmpty())
-                {
-                    if(!this->m_condNotFull->wait(this->m_mutex,5000))
-                    {
-                        this->m_mutex->unlock();
-                        if(gGblPara.m_bGblRst2Exit)
-                        {
-                            break;
-                        }
-                    }
-                }
-                if(gGblPara.m_bGblRst2Exit)
-                {
-                    break;
-                }
+                //convert cv::Mat to QImage.
+                QImage imgNew=cvMat2QImage(mat);
+                emit this->ZSigNewImg(imgNew);
 
-                //here,we resize image size to reduce imgproc time.
-                //(RTSP_H264_WIDTH,RTSP_H264_HEIGHT) --> (ImgResizedWidth,ImgResizedHeight)
-                cv::resize(mat,matResize,cv::Size(ImgResizedWidth,ImgResizedHeight));
-
-                cv::Mat *matDest=this->m_queueFree->dequeue();
-                memcpy(matDest->data,matResize.data,matResize.cols*matResize.rows*matResize.channels());
-                this->m_queueUsed->enqueue(matDest);
-                this->m_condNotEmpty->wakeAll();
-                this->m_mutex->unlock();
                 //qDebug()<<this->m_rtspAddr<<":"<<"push one frame";
 
                 //if json protocol turn off imgproc,then stop capturing.
@@ -125,7 +84,7 @@ void ZRtspThread::run()
     qDebug()<<"rtsp thread"<<this->m_rtspAddr<<"done.";
     return;
 }
-bool ZRtspThread::ZIsCleanup()
+bool ZRtspThread2::ZIsCleanup()
 {
     return this->m_bCleanup;
 }

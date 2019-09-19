@@ -5,6 +5,7 @@
 #include <QTimer>
 //#include <QWidget>
 #include "zrtspthread.h"
+#include "zrtspthread2.h"
 #include "zimgprocthread.h"
 #include <QQueue>
 #include <QByteArray>
@@ -24,6 +25,7 @@ private:
     ZRtspThread *m_rtsp1;
     ZRtspThread *m_rtsp2;
     ZImgProcThread *m_imgProc;
+    ZRtspThread2 *m_rtsp3;
 private:
     QTimer *m_timerExit;
 private:

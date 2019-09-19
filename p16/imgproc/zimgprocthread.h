@@ -18,6 +18,8 @@ public:
     qint32 ZBindQueue2(QMutex *mutex,///<
                        QWaitCondition *condNotEmpty,QWaitCondition *condNotFull,///<
                        QQueue<cv::Mat*> *queueFree,QQueue<cv::Mat*> *queueUsed);
+
+    bool ZIsCleanup();
 signals:
     void ZSigNewImg1(const QImage &img);
     void ZSigNewImg2(const QImage &img);
@@ -36,6 +38,8 @@ private:
     QWaitCondition *m_condNotFull2;
     QQueue<cv::Mat*> *m_queueFree2;
     QQueue<cv::Mat*> *m_queueUsed2;
+private:
+    bool m_bCleanup;
 };
 
 #endif // ZIMGPROCTHREAD_H

@@ -66,6 +66,7 @@ SOURCES += main.cpp \
     forward/ztcp2uartthread.cpp \
     imgproc/zimgprocthread.cpp \
     imgproc/zrtspthread.cpp \
+    imgproc/zrtspthread2.cpp \
     ui/zimgdispui.cpp \
     ui/zmainui.cpp \
     imgproc/zvideotask.cpp \
@@ -106,6 +107,7 @@ HEADERS += \
     forward/ztcp2uartthread.h \
     imgproc/zimgprocthread.h \
     imgproc/zrtspthread.h \
+    imgproc/zrtspthread2.h \
     ui/zimgdispui.h \
     ui/zmainui.h \
     imgproc/zvideotask.h \

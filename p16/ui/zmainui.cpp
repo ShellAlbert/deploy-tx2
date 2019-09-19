@@ -8,6 +8,7 @@
 ZMainUI::ZMainUI(QWidget *parent):QWidget(parent)
 {
     this->m_UILft=NULL;
+    this->m_UIMid=NULL;
     this->m_UIRht=NULL;
     this->m_hLayout=NULL;
 
@@ -28,6 +29,10 @@ ZMainUI::~ZMainUI()
     if(this->m_UILft)
     {
         delete this->m_UILft;
+    }
+    if(this->m_UIMid)
+    {
+        delete this->m_UIMid;
     }
     if(this->m_UIRht)
     {
@@ -79,8 +84,10 @@ ZImgDispUI* ZMainUI::ZGetDispUI(qint32 index)
         return this->m_UILft;
         break;
     case 1:
-        return this->m_UIRht;
+        return this->m_UIMid;
         break;
+    case 2:
+        return this->m_UIRht;
     default:
         break;
     }
@@ -90,6 +97,7 @@ qint32 ZMainUI::ZDoInit()
 {
     try{
         this->m_UILft=new ZImgDispUI("MAIN",true);
+        this->m_UIMid=new ZImgDispUI("MID");
         this->m_UIRht=new ZImgDispUI("AUX");
         this->m_hLayout=new QHBoxLayout;
 
@@ -112,11 +120,16 @@ qint32 ZMainUI::ZDoInit()
     {
         return -1;
     }
+    if(this->m_UIMid->ZDoInit()<0)
+    {
+        return -1;
+    }
     if(this->m_UIRht->ZDoInit()<0)
     {
         return -1;
     }
     this->m_hLayout->addWidget(this->m_UILft);
+    this->m_hLayout->addWidget(this->m_UIMid);
     this->m_hLayout->addWidget(this->m_UIRht);
 
     QObject::connect(this->m_btnImgProcOn,SIGNAL(clicked(bool)),this,SLOT(ZSlotImgProcOn()));

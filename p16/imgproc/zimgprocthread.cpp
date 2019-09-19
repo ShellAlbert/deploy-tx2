@@ -12,7 +12,19 @@
 #include <opencv2/highgui.hpp>
 ZImgProcThread::ZImgProcThread()
 {
+    this->m_mutex1=NULL;
+    this->m_condNotEmpty1=NULL;
+    this->m_condNotFull1=NULL;
+    this->m_queueFree1=NULL;
+    this->m_queueUsed1=NULL;
 
+    this->m_mutex2=NULL;
+    this->m_condNotEmpty2=NULL;
+    this->m_condNotFull2=NULL;
+    this->m_queueFree2=NULL;
+    this->m_queueUsed2=NULL;
+
+    this->m_bCleanup=false;
 }
 qint32 ZImgProcThread::ZBindQueue1(QMutex *mutex,///<
                                    QWaitCondition *condNotEmpty,QWaitCondition *condNotFull,///<
@@ -342,4 +354,9 @@ void ZImgProcThread::run()
     delete matAuxImg;
 
     qDebug()<<"imgproc thread done.";
+    this->m_bCleanup=true;
+}
+bool ZImgProcThread::ZIsCleanup()
+{
+    return this->m_bCleanup;
 }

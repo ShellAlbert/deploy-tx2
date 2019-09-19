@@ -32,6 +32,7 @@ protected:
 private:
     QLabel *m_llTop;//top label.
     ZImgDispUI *m_UILft;//the left main camera.
+    ZImgDispUI *m_UIMid;//the middle camera.
     ZImgDispUI *m_UIRht;//the right aux camera.
     QHBoxLayout *m_hLayout;
 
