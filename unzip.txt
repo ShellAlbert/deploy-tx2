@@ -1,0 +1,10 @@
+tar cvfj plughw_card_device_dev_0_analog_audio_demode.tar.bz2  plughw_card_device_dev_0_analog_audio_demode/
+
+zip -e plughw_card_device_dev_0_analog_audio_demode.zip plughw_card_device_dev_0_analog_audio_demode.tar.bz2 
+
+unzip plughw_card_device_dev_0_analog_audio_demode.zip 
+Archive:  plughw_card_device_dev_0_analog_audio_demode.zip
+[plughw_card_device_dev_0_analog_audio_demode.zip] plughw_card_device_dev_0_analog_audio_demode.tar.bz2 password: 
+  inflating: plughw_card_device_dev_0_analog_audio_demode.tar.bz2
+
+tiantian birthday.
